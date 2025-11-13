@@ -17,6 +17,7 @@ namespace ODB___Extractor
         private const string DefaultStatisticText = "No component data loaded.";
 
         private bool _suspendSelection;
+        private bool _isLoading;
         private ODBppExtractor.JobReport _currentJobReport;
 
         public ExtractorForm()
@@ -157,14 +158,14 @@ namespace ODB___Extractor
 
         }
 
-        private void txt_Path_TextChanged(object sender, EventArgs e)
+        private async void txt_Path_TextChanged(object sender, EventArgs e)
         {
-            LoadCurrentPath();
+            await LoadCurrentPathAsync();
         }
 
-        private void btn_RefreshData_Click(object sender, EventArgs e)
+        private async void btn_RefreshData_Click(object sender, EventArgs e)
         {
-            LoadCurrentPath();
+            await LoadCurrentPathAsync();
         }
 
         private void HandleStepSelectionChange()
@@ -225,7 +226,7 @@ namespace ODB___Extractor
             };
         }
 
-        private void LoadCurrentPath()
+        private async Task LoadCurrentPathAsync()
         {
             var path = txt_Path.Text?.Trim();
             if (string.IsNullOrEmpty(path))
@@ -234,12 +235,19 @@ namespace ODB___Extractor
                 return;
             }
 
-            lbl_Status.Text = "Loading ODB++ job...";
+            if (_isLoading)
+            {
+                return;
+            }
+
+            var friendlyName = string.IsNullOrWhiteSpace(path) ? "ODB++ job" : Path.GetFileName(path);
+            lbl_Status.Text = $"Loading '{friendlyName}'...";
             ClearVisuals();
+            BeginLoad();
 
             try
             {
-                var result = ODBppExtractor.Extract(path);
+                var result = await Task.Run(() => ODBppExtractor.Extract(path));
                 if (!result.IsSuccessful)
                 {
                     ShowError(result.ErrorMessage ?? "Failed to load ODB++ job.");
@@ -261,6 +269,10 @@ namespace ODB___Extractor
             {
                 ShowError($"Unexpected error while loading ODB++ job: {ex.Message}");
                 ResetUi("Failed to load ODB++ job.");
+            }
+            finally
+            {
+                EndLoad();
             }
         }
 
@@ -369,6 +381,37 @@ namespace ODB___Extractor
             _currentJobReport = null;
             ClearVisuals();
             lbl_Status.Text = statusMessage;
+        }
+
+        private void BeginLoad()
+        {
+            if (_isLoading)
+            {
+                return;
+            }
+
+            _isLoading = true;
+            SetActionButtonsEnabled(false);
+        }
+
+        private void EndLoad()
+        {
+            if (!_isLoading)
+            {
+                return;
+            }
+
+            _isLoading = false;
+            SetActionButtonsEnabled(true);
+        }
+
+        private void SetActionButtonsEnabled(bool enabled)
+        {
+            btn_BrowseDir.Enabled = enabled;
+            btn_BrowseFile.Enabled = enabled;
+            btn_RefreshData.Enabled = enabled;
+            btn_ExportLayer.Enabled = enabled;
+            btn_ExportAllLayer.Enabled = enabled;
         }
 
         private void ClearVisuals()
