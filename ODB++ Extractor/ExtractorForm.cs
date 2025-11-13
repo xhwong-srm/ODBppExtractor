@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace ODB___Extractor
 {
-    public partial class Form1 : Form
+    public partial class ExtractorForm : Form
     {
-        public Form1()
+        public ExtractorForm()
         {
             InitializeComponent();
         }
