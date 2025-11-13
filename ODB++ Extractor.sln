@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.36422.26
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODB++ Extractor", "ODB++ Extractor\ODB++ Extractor.csproj", "{03E3B8BA-38FB-4A06-B2EE-623E57CE1B4F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03E3B8BA-38FB-4A06-B2EE-623E57CE1B4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03E3B8BA-38FB-4A06-B2EE-623E57CE1B4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03E3B8BA-38FB-4A06-B2EE-623E57CE1B4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03E3B8BA-38FB-4A06-B2EE-623E57CE1B4F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DAE5EE07-C8D2-4328-8396-6A9984581F6B}
+	EndGlobalSection
+EndGlobal
