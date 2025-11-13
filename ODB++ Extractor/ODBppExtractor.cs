@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Lzw;
 using ICSharpCode.SharpZipLib.Tar;
+using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
 
 namespace ODB___Extractor
@@ -152,6 +153,8 @@ namespace ODB___Extractor
             public string ComponentsPath { get; set; }
             public ComponentData Components { get; set; }
             public EdaData Eda { get; set; }
+
+            public override string ToString() => Name ?? base.ToString();
         }
         /// <summary>
         /// Aggregates per-step artifacts such as the profile, layers, and package data.
@@ -174,6 +177,8 @@ namespace ODB___Extractor
             public BoundingBoxData? ProfileBoundingBox { get; set; }
             public List<LayerReport> Layers { get; }
             public EdaData Eda { get; set; }
+
+            public override string ToString() => Name ?? base.ToString();
         }
         /// <summary>
         /// Stores the parsed PCB outline (profile) along with the original unit of measurement.
@@ -327,7 +332,7 @@ namespace ODB___Extractor
         /// <summary>
         /// Entry point for consumers: extracts an ODB++ archive/directory and builds the job/component reports.
         /// </summary>
-        /// <param name="inputPath">Path to the .tgz/.tar.gz archive or already-extracted job directory.</param>
+        /// <param name="inputPath">Path to a supported archive (.tgz, .tar.gz, .tar, .zip) or already-extracted job directory.</param>
         /// <returns>Success metadata plus references to the generated XML reports, or an error payload.</returns>
         public static ExtractionResult Extract(string inputPath, ExportPreferences exportPreferences = null)
         {
@@ -350,8 +355,8 @@ namespace ODB___Extractor
             try
             {
                 var normalizedInputPath = Environment.ExpandEnvironmentVariables(inputPath.Trim().Trim('"'));
-
-                var isArchiveFile = File.Exists(normalizedInputPath) && IsGZipTarFile(normalizedInputPath);
+                var archiveFormat = GetArchiveFormat(normalizedInputPath);
+                var isArchiveFile = File.Exists(normalizedInputPath) && archiveFormat != ArchiveFormat.None;
                 var isDirectory = Directory.Exists(normalizedInputPath);
 
                 if (!isArchiveFile && !isDirectory)
@@ -375,7 +380,7 @@ namespace ODB___Extractor
 
                     try
                     {
-                        ExtractTarGz(normalizedInputPath, extractDir);
+                        ExtractArchive(normalizedInputPath, extractDir, archiveFormat);
                         extracted = true;
                         LogInfo($"Archive extracted to: {extractDir}");
                     }
@@ -476,10 +481,56 @@ namespace ODB___Extractor
 
         #region Archive Handling
 
-        private static bool IsGZipTarFile(string path)
+        private enum ArchiveFormat
         {
-            return path.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase)
-                   || path.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase);
+            None,
+            GZipTar,
+            Tar,
+            Zip
+        }
+
+        private static ArchiveFormat GetArchiveFormat(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return ArchiveFormat.None;
+            }
+
+            if (path.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase)
+                || path.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase))
+            {
+                return ArchiveFormat.GZipTar;
+            }
+
+            if (path.EndsWith(".tar", StringComparison.OrdinalIgnoreCase))
+            {
+                return ArchiveFormat.Tar;
+            }
+
+            if (path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                return ArchiveFormat.Zip;
+            }
+
+            return ArchiveFormat.None;
+        }
+
+        private static void ExtractArchive(string archivePath, string extractDirectory, ArchiveFormat format)
+        {
+            switch (format)
+            {
+                case ArchiveFormat.GZipTar:
+                    ExtractTarGz(archivePath, extractDirectory);
+                    break;
+                case ArchiveFormat.Tar:
+                    ExtractTar(archivePath, extractDirectory);
+                    break;
+                case ArchiveFormat.Zip:
+                    ExtractZip(archivePath, extractDirectory);
+                    break;
+                default:
+                    throw new NotSupportedException("Unsupported archive format.");
+            }
         }
 
         private static void ExtractTarGz(string archivePath, string extractDirectory)
@@ -489,8 +540,27 @@ namespace ODB___Extractor
             using (var gzipStream = new GZipInputStream(fileStream))
             using (var tarStream = new TarInputStream(gzipStream, Encoding.UTF8))
             {
-                TarEntry entry;
-                while ((entry = tarStream.GetNextEntry()) != null)
+                ExtractTarEntries(tarStream, normalizedExtractDir);
+            }
+        }
+
+        private static void ExtractTar(string archivePath, string extractDirectory)
+        {
+            var normalizedExtractDir = Path.GetFullPath(extractDirectory);
+            using (var fileStream = File.OpenRead(archivePath))
+            using (var tarStream = new TarInputStream(fileStream, Encoding.UTF8))
+            {
+                ExtractTarEntries(tarStream, normalizedExtractDir);
+            }
+        }
+
+        private static void ExtractZip(string archivePath, string extractDirectory)
+        {
+            var normalizedExtractDir = Path.GetFullPath(extractDirectory);
+            using (var zipFile = new ZipFile(archivePath))
+            {
+                zipFile.IsStreamOwner = true;
+                foreach (ZipEntry entry in zipFile)
                 {
                     var entryName = entry.Name.Replace('/', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar);
                     if (string.IsNullOrWhiteSpace(entryName))
@@ -517,10 +587,48 @@ namespace ODB___Extractor
                         Directory.CreateDirectory(targetDir);
                     }
 
+                    using (var entryStream = zipFile.GetInputStream(entry))
                     using (var outputStream = File.Create(targetPath))
                     {
-                        tarStream.CopyEntryContents(outputStream);
+                        entryStream.CopyTo(outputStream);
                     }
+                }
+            }
+        }
+
+        private static void ExtractTarEntries(TarInputStream tarStream, string normalizedExtractDir)
+        {
+            TarEntry entry;
+            while ((entry = tarStream.GetNextEntry()) != null)
+            {
+                var entryName = entry.Name.Replace('/', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar);
+                if (string.IsNullOrWhiteSpace(entryName))
+                {
+                    continue;
+                }
+
+                var targetPath = Path.GetFullPath(Path.Combine(normalizedExtractDir, entryName));
+                if (!targetPath.StartsWith(normalizedExtractDir + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                    && !string.Equals(targetPath, normalizedExtractDir, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException("Archive contains entries outside the target extraction path.");
+                }
+
+                if (entry.IsDirectory)
+                {
+                    Directory.CreateDirectory(targetPath);
+                    continue;
+                }
+
+                var targetDir = Path.GetDirectoryName(targetPath);
+                if (!string.IsNullOrEmpty(targetDir))
+                {
+                    Directory.CreateDirectory(targetDir);
+                }
+
+                using (var outputStream = File.Create(targetPath))
+                {
+                    tarStream.CopyEntryContents(outputStream);
                 }
             }
         }
