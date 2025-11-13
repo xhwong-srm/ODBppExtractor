@@ -329,11 +329,16 @@ namespace ODB___Extractor
         /// </summary>
         /// <param name="inputPath">Path to the .tgz/.tar.gz archive or already-extracted job directory.</param>
         /// <returns>Success metadata plus references to the generated XML reports, or an error payload.</returns>
-        public static ExtractionResult Extract(string inputPath)
+        public static ExtractionResult Extract(string inputPath, ExportPreferences exportPreferences = null)
         {
             if (string.IsNullOrWhiteSpace(inputPath))
             {
                 return ExtractionResult.Failure("No path provided.");
+            }
+
+            if (exportPreferences == null)
+            {
+                exportPreferences = ExportPreferences.Default;
             }
 
             string extractDir = string.Empty;
@@ -401,10 +406,48 @@ namespace ODB___Extractor
                     return ExtractionResult.Failure(message, normalizedInputPath, extractDir);
                 }
 
-                var jobReportPath = SaveJobReport(jobReport);
-                var componentReportPath = SaveComponentPlacementReport(jobReport);
+                if (exportPreferences.LayerSelectionProvider != null && exportPreferences.ComponentLayerFilter == null)
+                {
+                    var selectedLayers = exportPreferences.LayerSelectionProvider(jobReport);
+                    exportPreferences.ComponentLayerFilter = selectedLayers ?? Array.Empty<string>();
+                }
 
-                return ExtractionResult.Success(normalizedInputPath, extractDir, jobReport, jobReportPath, componentReportPath);
+                var jobReportPath = exportPreferences.ExportJobReport ? SaveJobReport(jobReport) : string.Empty;
+                var componentReportPaths = new List<string>();
+                var topLeftComponentReportPaths = new List<string>();
+                HashSet<string> layerFilter = null;
+                if (exportPreferences.ComponentLayerFilter != null && exportPreferences.ComponentLayerFilter.Count > 0)
+                {
+                    layerFilter = new HashSet<string>(
+                        exportPreferences.ComponentLayerFilter
+                            .Where(name => name != null)
+                            .Select(name => string.IsNullOrWhiteSpace(name) ? string.Empty : name.Trim()),
+                        StringComparer.OrdinalIgnoreCase);
+                }
+
+                switch (exportPreferences.ComponentMode)
+                {
+                    case ComponentExportMode.BottomLeft:
+                        componentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.BottomLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter));
+                        break;
+                    case ComponentExportMode.TopLeft:
+                        topLeftComponentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.TopLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter));
+                        break;
+                    case ComponentExportMode.Both:
+                        componentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.BottomLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter));
+                        topLeftComponentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.TopLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter));
+                        break;
+                    case ComponentExportMode.None:
+                        break;
+                }
+
+                return ExtractionResult.Success(
+                    normalizedInputPath,
+                    extractDir,
+                    jobReport,
+                    jobReportPath,
+                    componentReportPaths,
+                    topLeftComponentReportPaths);
             }
             catch (Exception ex)
             {
@@ -1231,7 +1274,7 @@ namespace ODB___Extractor
                 return "{}";
             }
 
-            return "{" + string.Join(", ", parameters.Select(kv => $"{kv.Key}={kv.Value}") ) + "}";
+            return "{" + string.Join(", ", parameters.Select(kv => $"{kv.Key}={kv.Value}")) + "}";
         }
 
         private static string FormatPolygon(IReadOnlyList<IReadOnlyList<double>> polygon)
@@ -1269,34 +1312,104 @@ namespace ODB___Extractor
             return filePath;
         }
 
-        private static string SaveComponentPlacementReport(JobReport report)
+        private static IReadOnlyList<string> SaveComponentPlacementReport(JobReport report, CoordinateOrigin origin, bool separateByLayer, HashSet<string> layerFilter)
         {
-            var layerElements = BuildComponentPlacementLayerElements(report);
-            if (layerElements.Count == 0)
+            if (!separateByLayer)
             {
-                LogInfo("Component placement report skipped (no components with package data).");
-                return string.Empty;
+                var layerElements = BuildComponentPlacementLayerElements(report, origin, layerFilter);
+                if (layerElements.Count == 0)
+                {
+                    LogInfo($"Component placement report ({FormatOrigin(origin)}) skipped (no components with package data).");
+                    return Array.Empty<string>();
+                }
+
+                var filePath = SaveComponentPlacementDocument(report, origin, "_components", layerElements);
+                return new[] { filePath };
             }
 
+            var entries = BuildComponentPlacementEntries(report, origin, layerFilter);
+            if (entries.Count == 0)
+            {
+                LogInfo($"Component placement report ({FormatOrigin(origin)}) skipped (no components with package data).");
+                return Array.Empty<string>();
+            }
+
+            var filePaths = new List<string>();
+            var usedSuffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var layerGroup in entries.GroupBy(entry => entry.Layer ?? string.Empty))
+            {
+                var layerName = string.IsNullOrWhiteSpace(layerGroup.Key) ? "layer" : layerGroup.Key;
+                var sanitizedLayer = SanitizeFileName(layerName);
+                if (string.IsNullOrEmpty(sanitizedLayer))
+                {
+                    sanitizedLayer = "layer";
+                }
+
+                var suffix = $"_components_{sanitizedLayer}";
+                var uniqueSuffix = suffix;
+                var suffixIndex = 1;
+                while (usedSuffixes.Contains(uniqueSuffix))
+                {
+                    uniqueSuffix = $"{suffix}_{suffixIndex++}";
+                }
+
+                usedSuffixes.Add(uniqueSuffix);
+
+                var layerElements = BuildStepElementsFromEntries(layerGroup);
+                if (layerElements.Count == 0)
+                {
+                    continue;
+                }
+
+                var filePath = SaveComponentPlacementDocument(report, origin, uniqueSuffix, layerElements, layerName);
+                filePaths.Add(filePath);
+            }
+
+            return filePaths;
+        }
+
+        private static string SaveComponentPlacementDocument(
+            JobReport report,
+            CoordinateOrigin origin,
+            string suffix,
+            IReadOnlyList<XElement> stepElements,
+            string layerName = null)
+        {
             var reportsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "reports");
             Directory.CreateDirectory(reportsDir);
             var archiveName = string.IsNullOrEmpty(report.SourceArchive) ? "job" : Path.GetFileNameWithoutExtension(report.SourceArchive);
             var baseName = SanitizeFileName(archiveName);
             var timestamp = report.ExtractedAt.ToString("yyyyMMddHHmmss");
-            var filePath = Path.Combine(reportsDir, $"{baseName}_{timestamp}_components.xml");
+            var filePath = Path.Combine(reportsDir, $"{baseName}_{timestamp}{suffix}.xml");
 
-            var doc = new XDocument(
-                new XElement("boards",
-                    new XAttribute("generatedAt", report.ExtractedAt.ToString("o")),
-                    new XAttribute("count", layerElements.Sum(step => step.Elements("layer").Sum(layer => layer.Elements("component").Count()))),
-                    layerElements));
+            var componentCount = stepElements.Sum(step => step.Elements("layer").Sum(layer => layer.Elements("component").Count()));
+            var boardsElement = new XElement("boards",
+                new XAttribute("generatedAt", report.ExtractedAt.ToString("o")),
+                new XAttribute("origin", FormatOrigin(origin)),
+                new XAttribute("count", componentCount),
+                stepElements);
 
+            if (!string.IsNullOrWhiteSpace(layerName))
+            {
+                boardsElement.Add(new XAttribute("layer", layerName));
+            }
+
+            var doc = new XDocument(boardsElement);
             doc.Save(filePath);
-            LogInfo($"Component placement report saved to {filePath}");
+            LogInfo($"Component placement report ({FormatOrigin(origin)}{(string.IsNullOrWhiteSpace(layerName) ? string.Empty : $" layer={layerName}")}) saved to {filePath}");
             return filePath;
         }
 
-        private static List<XElement> BuildComponentPlacementLayerElements(JobReport report)
+        private static string FormatOrigin(CoordinateOrigin origin) =>
+            origin == CoordinateOrigin.TopLeft ? "top-left" : "bottom-left";
+
+        private static List<XElement> BuildComponentPlacementLayerElements(JobReport report, CoordinateOrigin origin, HashSet<string> layerFilter)
+        {
+            var entries = BuildComponentPlacementEntries(report, origin, layerFilter);
+            return BuildStepElementsFromEntries(entries);
+        }
+
+        private static List<LayerComponentEntry> BuildComponentPlacementEntries(JobReport report, CoordinateOrigin origin, HashSet<string> layerFilter)
         {
             var entries = new List<LayerComponentEntry>();
             foreach (var step in report.Steps)
@@ -1328,10 +1441,15 @@ namespace ODB___Extractor
                     {
                         continue;
                     }
+                    var layerName = layer.Name ?? string.Empty;
+                    if (!IsLayerAllowed(layerName, layerFilter))
+                    {
+                        continue;
+                    }
 
                     foreach (var component in componentData.Records)
                     {
-                        var result = BuildComponentPlacementElement(step, layer, component, eda, packageByIndex);
+                        var result = BuildComponentPlacementElement(step, layer, component, eda, packageByIndex, origin);
                         if (result != null)
                         {
                             entries.Add(new LayerComponentEntry(
@@ -1347,8 +1465,13 @@ namespace ODB___Extractor
                 }
             }
 
-            var groupedSteps = entries.GroupBy(entry => entry.Step ?? string.Empty);
+            return entries;
+        }
+
+        private static List<XElement> BuildStepElementsFromEntries(IEnumerable<LayerComponentEntry> entries)
+        {
             var stepElements = new List<XElement>();
+            var groupedSteps = entries.GroupBy(entry => entry.Step ?? string.Empty);
 
             foreach (var stepGroup in groupedSteps)
             {
@@ -1371,8 +1494,8 @@ namespace ODB___Extractor
                 {
                     stepElement.Add(new XAttribute("length", FormatDouble(stepLength.Value)));
                 }
-                var layerGroups = stepGroup.GroupBy(entry => (Layer: entry.Layer ?? string.Empty, Unit: entry.Unit ?? string.Empty));
 
+                var layerGroups = stepGroup.GroupBy(entry => (Layer: entry.Layer ?? string.Empty, Unit: entry.Unit ?? string.Empty));
                 foreach (var layerGroup in layerGroups)
                 {
                     var layerElement = new XElement("layer",
@@ -1389,16 +1512,28 @@ namespace ODB___Extractor
             return stepElements;
         }
 
+        private static bool IsLayerAllowed(string layerName, HashSet<string> layerFilter)
+        {
+            if (layerFilter == null || layerFilter.Count == 0)
+            {
+                return true;
+            }
+
+            var normalizedLayer = string.IsNullOrWhiteSpace(layerName) ? string.Empty : layerName.Trim();
+            return layerFilter.Contains(normalizedLayer);
+        }
+
         /// <summary>
         /// Creates the XML element for a component, applying package geometry, mirroring rules, and the
-        /// profile-origin shift so that all reported coordinates are relative to (0,0).
+        /// profile-origin shift so that all reported coordinates are relative to (0,0) in the selected origin.
         /// </summary>
         private static ComponentPlacementResult BuildComponentPlacementElement(
             StepReport step,
             LayerReport layer,
             ComponentRecord component,
             EdaData eda,
-            IReadOnlyDictionary<int, PkgRecord> packageByIndex)
+            IReadOnlyDictionary<int, PkgRecord> packageByIndex,
+            CoordinateOrigin origin)
         {
             if (!TryResolvePackage(component.PkgRef, packageByIndex, out var pkg))
             {
@@ -1455,6 +1590,12 @@ namespace ODB___Extractor
                 centerY -= originOffsetY;
             }
 
+            if (origin == CoordinateOrigin.TopLeft
+                && TryGetStepHeight(step, componentUnit, out var stepHeight))
+            {
+                centerY = stepHeight - centerY;
+            }
+
             var baseWidth = outlineDimensions?.width ?? bounds.Width;
             var baseLength = outlineDimensions?.length ?? bounds.Length;
             var (width, length) = ApplyRotationToDimensions(baseWidth, baseLength, quarterTurns);
@@ -1470,6 +1611,12 @@ namespace ODB___Extractor
                 new XAttribute("length", FormatDouble(Math.Abs(length))));
 
             return new ComponentPlacementResult(componentUnit, componentElement);
+        }
+
+        private enum CoordinateOrigin
+        {
+            BottomLeft,
+            TopLeft
         }
 
         private sealed class LayerComponentEntry
@@ -2014,6 +2161,21 @@ namespace ODB___Extractor
             return true;
         }
 
+        private static bool TryGetStepHeight(StepReport step, string targetUnit, out double height)
+        {
+            height = 0;
+            if (step?.ProfileBoundingBox == null)
+            {
+                return false;
+            }
+
+            var bbox = step.ProfileBoundingBox.Value;
+            var convertedMinY = ConvertUnits(bbox.MinY, step.Unit, targetUnit);
+            var convertedMaxY = ConvertUnits(bbox.MaxY, step.Unit, targetUnit);
+            height = Math.Abs(convertedMaxY - convertedMinY);
+            return true;
+        }
+
         #endregion
 
         #region Utilities
@@ -2170,7 +2332,8 @@ namespace ODB___Extractor
                 string extractDirectory,
                 JobReport report,
                 string jobReportPath,
-                string componentReportPath,
+                IReadOnlyList<string> componentReportPaths,
+                IReadOnlyList<string> topLeftComponentReportPaths,
                 string errorMessage)
             {
                 IsSuccessful = isSuccessful;
@@ -2178,7 +2341,8 @@ namespace ODB___Extractor
                 ExtractDirectory = extractDirectory;
                 JobReport = report;
                 JobReportPath = jobReportPath;
-                ComponentReportPath = componentReportPath;
+                ComponentReportPaths = componentReportPaths ?? Array.Empty<string>();
+                TopLeftComponentReportPaths = topLeftComponentReportPaths ?? Array.Empty<string>();
                 ErrorMessage = errorMessage;
             }
 
@@ -2187,14 +2351,65 @@ namespace ODB___Extractor
             public string ExtractDirectory { get; }
             public JobReport JobReport { get; }
             public string JobReportPath { get; }
-            public string ComponentReportPath { get; }
+            public IReadOnlyList<string> ComponentReportPaths { get; }
+            public string ComponentReportPath => ComponentReportPaths.FirstOrDefault() ?? string.Empty;
+            public IReadOnlyList<string> TopLeftComponentReportPaths { get; }
+            public string TopLeftComponentReportPath => TopLeftComponentReportPaths.FirstOrDefault() ?? string.Empty;
             public string ErrorMessage { get; }
 
-            public static ExtractionResult Success(string inputPath, string extractDirectory, JobReport report, string jobReportPath, string componentReportPath) =>
-                new ExtractionResult(true, inputPath, extractDirectory, report, jobReportPath, componentReportPath, string.Empty);
+            public static ExtractionResult Success(
+                string inputPath,
+                string extractDirectory,
+                JobReport report,
+                string jobReportPath,
+                IReadOnlyList<string> componentReportPaths,
+                IReadOnlyList<string> topLeftComponentReportPaths) =>
+                new ExtractionResult(
+                    true,
+                    inputPath,
+                    extractDirectory,
+                    report,
+                    jobReportPath,
+                    componentReportPaths,
+                    topLeftComponentReportPaths,
+                    string.Empty);
 
             public static ExtractionResult Failure(string message, string inputPath = null, string extractDirectory = null) =>
-                new ExtractionResult(false, inputPath ?? string.Empty, extractDirectory ?? string.Empty, null, string.Empty, string.Empty, message);
+                new ExtractionResult(
+                    false,
+                    inputPath ?? string.Empty,
+                    extractDirectory ?? string.Empty,
+                    null,
+                    string.Empty,
+                    Array.Empty<string>(),
+                    Array.Empty<string>(),
+                    message);
+        }
+
+        public sealed class ExportPreferences
+        {
+            public ExportPreferences()
+            {
+                ExportJobReport = true;
+                ComponentMode = ComponentExportMode.Both;
+                SeparateComponentFilesByLayer = false;
+            }
+
+            public bool ExportJobReport { get; set; }
+            public ComponentExportMode ComponentMode { get; set; }
+            public bool SeparateComponentFilesByLayer { get; set; }
+            public IReadOnlyList<string> ComponentLayerFilter { get; set; }
+            public Func<JobReport, IReadOnlyList<string>> LayerSelectionProvider { get; set; }
+
+            public static ExportPreferences Default => new ExportPreferences();
+        }
+
+        public enum ComponentExportMode
+        {
+            None,
+            BottomLeft,
+            TopLeft,
+            Both
         }
 
         #endregion

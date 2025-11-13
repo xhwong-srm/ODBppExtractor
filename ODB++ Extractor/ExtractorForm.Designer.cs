@@ -80,6 +80,7 @@ namespace ODB___Extractor
             resources.ApplyResources(this.txt_Path, "txt_Path");
             this.txt_Path.Name = "txt_Path";
             this.txt_Path.NormalBackColor = System.Drawing.Color.White;
+            this.txt_Path.ReadOnly = true;
             this.txt_Path.TextChanged += new System.EventHandler(this.txt_Path_TextChanged);
             // 
             // btn_BrowseDir
