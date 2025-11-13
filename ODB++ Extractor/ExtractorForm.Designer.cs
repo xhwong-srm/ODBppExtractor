@@ -29,22 +29,25 @@ namespace ODB___Extractor
         /// </summary>
         private void InitializeComponent()
         {
-            this.lbl_Path = new System.Windows.Forms.Label();
-            this.txt_Path = new System.Windows.Forms.TextBox();
-            this.btn_Browse = new System.Windows.Forms.Button();
-            this.btn_Refresh = new System.Windows.Forms.Button();
-            this.gb_ImportODBpp = new System.Windows.Forms.GroupBox();
-            this.lbl_Step = new System.Windows.Forms.Label();
-            this.lbl_Layer = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExtractorForm));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.lbl_Path = new SRMControl.SRMLabel();
+            this.txt_Path = new SRMControl.SRMInputBox();
+            this.btn_Browse = new SRMControl.SRMButton();
+            this.btn_Refresh = new SRMControl.SRMButton();
+            this.gb_ImportODBpp = new SRMControl.SRMGroupBox();
+            this.lbl_Step = new SRMControl.SRMLabel();
+            this.lbl_Layer = new SRMControl.SRMLabel();
+            this.cbo_Step = new SRMControl.SRMComboBox();
+            this.cbo_Layer = new SRMControl.SRMComboBox();
             this.dgv_Data = new System.Windows.Forms.DataGridView();
-            this.lbl_Statistic = new System.Windows.Forms.Label();
-            this.gb_Data = new System.Windows.Forms.GroupBox();
-            this.gb_Export = new System.Windows.Forms.GroupBox();
-            this.lbl_Status = new System.Windows.Forms.Label();
-            this.btn_ExportLayer = new System.Windows.Forms.Button();
-            this.btn_ExportAllLayer = new System.Windows.Forms.Button();
+            this.lbl_Statistic = new SRMControl.SRMLabel();
+            this.gb_Data = new SRMControl.SRMGroupBox();
+            this.gb_Export = new SRMControl.SRMGroupBox();
+            this.lbl_Status = new SRMControl.SRMLabel();
+            this.btn_ExportLayer = new SRMControl.SRMButton();
+            this.btn_ExportAllLayer = new SRMControl.SRMButton();
             this.gb_ImportODBpp.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_Data)).BeginInit();
             this.gb_Data.SuspendLayout();
@@ -53,168 +56,179 @@ namespace ODB___Extractor
             // 
             // lbl_Path
             // 
-            this.lbl_Path.AutoSize = true;
-            this.lbl_Path.Location = new System.Drawing.Point(15, 32);
+            resources.ApplyResources(this.lbl_Path, "lbl_Path");
             this.lbl_Path.Name = "lbl_Path";
-            this.lbl_Path.Size = new System.Drawing.Size(41, 17);
-            this.lbl_Path.TabIndex = 1;
-            this.lbl_Path.Text = "Path:";
+            this.lbl_Path.TextShadowColor = System.Drawing.Color.Gray;
             // 
             // txt_Path
             // 
-            this.txt_Path.Location = new System.Drawing.Point(62, 29);
+            this.txt_Path.BackColor = System.Drawing.Color.White;
+            this.txt_Path.DecimalPlaces = 2;
+            this.txt_Path.DecMaxValue = new decimal(new int[] {
+            -1,
+            -1,
+            -1,
+            0});
+            this.txt_Path.DecMinValue = new decimal(new int[] {
+            -1,
+            -1,
+            -1,
+            -2147483648});
+            this.txt_Path.FocusBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            resources.ApplyResources(this.txt_Path, "txt_Path");
             this.txt_Path.Name = "txt_Path";
-            this.txt_Path.Size = new System.Drawing.Size(491, 22);
-            this.txt_Path.TabIndex = 2;
+            this.txt_Path.NormalBackColor = System.Drawing.Color.White;
+            this.txt_Path.TextChanged += new System.EventHandler(this.txt_Path_TextChanged);
             // 
             // btn_Browse
             // 
-            this.btn_Browse.Location = new System.Drawing.Point(559, 21);
+            resources.ApplyResources(this.btn_Browse, "btn_Browse");
             this.btn_Browse.Name = "btn_Browse";
-            this.btn_Browse.Size = new System.Drawing.Size(88, 38);
-            this.btn_Browse.TabIndex = 3;
-            this.btn_Browse.Text = "Browse";
             this.btn_Browse.UseVisualStyleBackColor = true;
+            this.btn_Browse.Click += new System.EventHandler(this.btn_Browse_Click);
             // 
             // btn_Refresh
             // 
-            this.btn_Refresh.Location = new System.Drawing.Point(653, 21);
+            resources.ApplyResources(this.btn_Refresh, "btn_Refresh");
             this.btn_Refresh.Name = "btn_Refresh";
-            this.btn_Refresh.Size = new System.Drawing.Size(88, 38);
-            this.btn_Refresh.TabIndex = 4;
-            this.btn_Refresh.Text = "Refresh";
             this.btn_Refresh.UseVisualStyleBackColor = true;
+            this.btn_Refresh.Click += new System.EventHandler(this.btn_Refresh_Click);
             // 
             // gb_ImportODBpp
             // 
+            this.gb_ImportODBpp.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(150)))), ((int)(((byte)(185)))));
             this.gb_ImportODBpp.Controls.Add(this.btn_Refresh);
             this.gb_ImportODBpp.Controls.Add(this.lbl_Path);
             this.gb_ImportODBpp.Controls.Add(this.btn_Browse);
             this.gb_ImportODBpp.Controls.Add(this.txt_Path);
-            this.gb_ImportODBpp.Location = new System.Drawing.Point(12, 12);
+            resources.ApplyResources(this.gb_ImportODBpp, "gb_ImportODBpp");
             this.gb_ImportODBpp.Name = "gb_ImportODBpp";
-            this.gb_ImportODBpp.Size = new System.Drawing.Size(760, 70);
-            this.gb_ImportODBpp.TabIndex = 5;
             this.gb_ImportODBpp.TabStop = false;
-            this.gb_ImportODBpp.Text = "Import ODB++ Design";
             // 
             // lbl_Step
             // 
-            this.lbl_Step.AutoSize = true;
-            this.lbl_Step.Location = new System.Drawing.Point(16, 34);
+            resources.ApplyResources(this.lbl_Step, "lbl_Step");
             this.lbl_Step.Name = "lbl_Step";
-            this.lbl_Step.Size = new System.Drawing.Size(41, 17);
-            this.lbl_Step.TabIndex = 6;
-            this.lbl_Step.Text = "Step:";
+            this.lbl_Step.TextShadowColor = System.Drawing.Color.Gray;
             // 
             // lbl_Layer
             // 
-            this.lbl_Layer.AutoSize = true;
-            this.lbl_Layer.Location = new System.Drawing.Point(300, 34);
+            resources.ApplyResources(this.lbl_Layer, "lbl_Layer");
             this.lbl_Layer.Name = "lbl_Layer";
-            this.lbl_Layer.Size = new System.Drawing.Size(48, 17);
-            this.lbl_Layer.TabIndex = 7;
-            this.lbl_Layer.Text = "Layer:";
+            this.lbl_Layer.TextShadowColor = System.Drawing.Color.Gray;
             // 
-            // comboBox1
+            // cbo_Step
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(63, 30);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(200, 24);
-            this.comboBox1.TabIndex = 8;
+            this.cbo_Step.BackColor = System.Drawing.Color.White;
+            this.cbo_Step.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbo_Step.FocusBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.cbo_Step.FormattingEnabled = true;
+            resources.ApplyResources(this.cbo_Step, "cbo_Step");
+            this.cbo_Step.Name = "cbo_Step";
+            this.cbo_Step.NormalBackColor = System.Drawing.Color.White;
+            this.cbo_Step.SelectedIndexChanged += new System.EventHandler(this.cbo_Step_SelectedIndexChanged);
             // 
-            // comboBox2
+            // cbo_Layer
             // 
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(354, 30);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(200, 24);
-            this.comboBox2.TabIndex = 9;
+            this.cbo_Layer.BackColor = System.Drawing.Color.White;
+            this.cbo_Layer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbo_Layer.FocusBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.cbo_Layer.FormattingEnabled = true;
+            resources.ApplyResources(this.cbo_Layer, "cbo_Layer");
+            this.cbo_Layer.Name = "cbo_Layer";
+            this.cbo_Layer.NormalBackColor = System.Drawing.Color.White;
+            this.cbo_Layer.SelectedIndexChanged += new System.EventHandler(this.cbo_Layer_SelectedIndexChanged);
             // 
             // dgv_Data
             // 
+            this.dgv_Data.AllowUserToAddRows = false;
+            this.dgv_Data.AllowUserToDeleteRows = false;
+            this.dgv_Data.BackgroundColor = System.Drawing.Color.AliceBlue;
+            this.dgv_Data.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle9.BackColor = System.Drawing.Color.LightSkyBlue;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgv_Data.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this.dgv_Data.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgv_Data.Location = new System.Drawing.Point(19, 69);
+            resources.ApplyResources(this.dgv_Data, "dgv_Data");
             this.dgv_Data.Name = "dgv_Data";
-            this.dgv_Data.RowHeadersWidth = 51;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle10.BackColor = System.Drawing.Color.LightSkyBlue;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgv_Data.RowHeadersDefaultCellStyle = dataGridViewCellStyle10;
+            this.dgv_Data.RowHeadersVisible = false;
             this.dgv_Data.RowTemplate.Height = 24;
-            this.dgv_Data.Size = new System.Drawing.Size(723, 273);
-            this.dgv_Data.TabIndex = 10;
             // 
             // lbl_Statistic
             // 
-            this.lbl_Statistic.AutoSize = true;
-            this.lbl_Statistic.Location = new System.Drawing.Point(16, 345);
+            resources.ApplyResources(this.lbl_Statistic, "lbl_Statistic");
             this.lbl_Statistic.Name = "lbl_Statistic";
-            this.lbl_Statistic.Size = new System.Drawing.Size(57, 17);
-            this.lbl_Statistic.TabIndex = 11;
-            this.lbl_Statistic.Text = "Statistic";
+            this.lbl_Statistic.TextShadowColor = System.Drawing.Color.Gray;
             // 
             // gb_Data
             // 
+            this.gb_Data.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(150)))), ((int)(((byte)(185)))));
             this.gb_Data.Controls.Add(this.lbl_Statistic);
             this.gb_Data.Controls.Add(this.dgv_Data);
             this.gb_Data.Controls.Add(this.lbl_Step);
-            this.gb_Data.Controls.Add(this.comboBox2);
+            this.gb_Data.Controls.Add(this.cbo_Layer);
             this.gb_Data.Controls.Add(this.lbl_Layer);
-            this.gb_Data.Controls.Add(this.comboBox1);
-            this.gb_Data.Location = new System.Drawing.Point(11, 88);
+            this.gb_Data.Controls.Add(this.cbo_Step);
+            resources.ApplyResources(this.gb_Data, "gb_Data");
             this.gb_Data.Name = "gb_Data";
-            this.gb_Data.Size = new System.Drawing.Size(760, 377);
-            this.gb_Data.TabIndex = 12;
             this.gb_Data.TabStop = false;
-            this.gb_Data.Text = "Component Data";
             // 
             // gb_Export
             // 
+            this.gb_Export.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(150)))), ((int)(((byte)(185)))));
             this.gb_Export.Controls.Add(this.lbl_Status);
             this.gb_Export.Controls.Add(this.btn_ExportLayer);
             this.gb_Export.Controls.Add(this.btn_ExportAllLayer);
-            this.gb_Export.Location = new System.Drawing.Point(11, 471);
+            resources.ApplyResources(this.gb_Export, "gb_Export");
             this.gb_Export.Name = "gb_Export";
-            this.gb_Export.Size = new System.Drawing.Size(760, 70);
-            this.gb_Export.TabIndex = 13;
             this.gb_Export.TabStop = false;
-            this.gb_Export.Text = "Export";
             // 
             // lbl_Status
             // 
-            this.lbl_Status.AutoSize = true;
-            this.lbl_Status.Location = new System.Drawing.Point(15, 32);
+            resources.ApplyResources(this.lbl_Status, "lbl_Status");
             this.lbl_Status.Name = "lbl_Status";
-            this.lbl_Status.Size = new System.Drawing.Size(48, 17);
-            this.lbl_Status.TabIndex = 12;
-            this.lbl_Status.Text = "Status";
+            this.lbl_Status.TextShadowColor = System.Drawing.Color.Gray;
             // 
             // btn_ExportLayer
             // 
-            this.btn_ExportLayer.Location = new System.Drawing.Point(582, 21);
+            resources.ApplyResources(this.btn_ExportLayer, "btn_ExportLayer");
             this.btn_ExportLayer.Name = "btn_ExportLayer";
-            this.btn_ExportLayer.Size = new System.Drawing.Size(160, 38);
-            this.btn_ExportLayer.TabIndex = 5;
-            this.btn_ExportLayer.Text = "Export Current Layer";
             this.btn_ExportLayer.UseVisualStyleBackColor = true;
+            this.btn_ExportLayer.Click += new System.EventHandler(this.btn_ExportLayer_Click);
             // 
             // btn_ExportAllLayer
             // 
-            this.btn_ExportAllLayer.Location = new System.Drawing.Point(416, 21);
+            resources.ApplyResources(this.btn_ExportAllLayer, "btn_ExportAllLayer");
             this.btn_ExportAllLayer.Name = "btn_ExportAllLayer";
-            this.btn_ExportAllLayer.Size = new System.Drawing.Size(160, 38);
-            this.btn_ExportAllLayer.TabIndex = 5;
-            this.btn_ExportAllLayer.Text = "Export All Layer";
             this.btn_ExportAllLayer.UseVisualStyleBackColor = true;
+            this.btn_ExportAllLayer.Click += new System.EventHandler(this.btn_ExportAllLayer_Click);
             // 
             // ExtractorForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(782, 553);
+            this.AllowDrop = true;
+            resources.ApplyResources(this, "$this");
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(210)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
             this.Controls.Add(this.gb_Export);
             this.Controls.Add(this.gb_Data);
             this.Controls.Add(this.gb_ImportODBpp);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "ExtractorForm";
-            this.Text = "ODB++ Extractor";
+            this.ShowIcon = false;
             this.gb_ImportODBpp.ResumeLayout(false);
             this.gb_ImportODBpp.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_Data)).EndInit();
@@ -228,22 +242,22 @@ namespace ODB___Extractor
 
         #endregion
 
-        private System.Windows.Forms.Label lbl_Path;
-        private System.Windows.Forms.TextBox txt_Path;
-        private System.Windows.Forms.Button btn_Browse;
-        private System.Windows.Forms.Button btn_Refresh;
-        private System.Windows.Forms.GroupBox gb_ImportODBpp;
-        private System.Windows.Forms.Label lbl_Step;
-        private System.Windows.Forms.Label lbl_Layer;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.ComboBox comboBox2;
+        private SRMControl.SRMLabel lbl_Path;
+        private SRMControl.SRMInputBox txt_Path;
+        private SRMControl.SRMButton btn_Browse;
+        private SRMControl.SRMButton btn_Refresh;
+        private SRMControl.SRMGroupBox gb_ImportODBpp;
+        private SRMControl.SRMLabel lbl_Step;
+        private SRMControl.SRMLabel lbl_Layer;
+        private SRMControl.SRMComboBox cbo_Step;
+        private SRMControl.SRMComboBox cbo_Layer;
         private System.Windows.Forms.DataGridView dgv_Data;
-        private System.Windows.Forms.Label lbl_Statistic;
-        private System.Windows.Forms.GroupBox gb_Data;
-        private System.Windows.Forms.GroupBox gb_Export;
-        private System.Windows.Forms.Label lbl_Status;
-        private System.Windows.Forms.Button btn_ExportLayer;
-        private System.Windows.Forms.Button btn_ExportAllLayer;
+        private SRMControl.SRMLabel lbl_Statistic;
+        private SRMControl.SRMGroupBox gb_Data;
+        private SRMControl.SRMGroupBox gb_Export;
+        private SRMControl.SRMLabel lbl_Status;
+        private SRMControl.SRMButton btn_ExportLayer;
+        private SRMControl.SRMButton btn_ExportAllLayer;
     }
 }
 

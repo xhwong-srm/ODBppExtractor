@@ -117,4 +117,430 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="lbl_Path.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="lbl_Path.Location" type="System.Drawing.Point, System.Drawing">
+    <value>15, 32</value>
+  </data>
+  <data name="lbl_Path.Size" type="System.Drawing.Size, System.Drawing">
+    <value>41, 17</value>
+  </data>
+  <data name="lbl_Path.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="lbl_Path.Text" xml:space="preserve">
+    <value>Path:</value>
+  </data>
+  <data name="&gt;&gt;lbl_Path.Name" xml:space="preserve">
+    <value>lbl_Path</value>
+  </data>
+  <data name="&gt;&gt;lbl_Path.Type" xml:space="preserve">
+    <value>SRMControl.SRMLabel, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;lbl_Path.Parent" xml:space="preserve">
+    <value>gb_ImportODBpp</value>
+  </data>
+  <data name="&gt;&gt;lbl_Path.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="txt_Path.Location" type="System.Drawing.Point, System.Drawing">
+    <value>62, 29</value>
+  </data>
+  <data name="txt_Path.Size" type="System.Drawing.Size, System.Drawing">
+    <value>480, 22</value>
+  </data>
+  <data name="txt_Path.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="txt_Path.Text" xml:space="preserve">
+    <value> </value>
+  </data>
+  <data name="&gt;&gt;txt_Path.Name" xml:space="preserve">
+    <value>txt_Path</value>
+  </data>
+  <data name="&gt;&gt;txt_Path.Type" xml:space="preserve">
+    <value>SRMControl.SRMInputBox, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;txt_Path.Parent" xml:space="preserve">
+    <value>gb_ImportODBpp</value>
+  </data>
+  <data name="&gt;&gt;txt_Path.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="btn_Browse.Location" type="System.Drawing.Point, System.Drawing">
+    <value>559, 21</value>
+  </data>
+  <data name="btn_Browse.Size" type="System.Drawing.Size, System.Drawing">
+    <value>88, 38</value>
+  </data>
+  <data name="btn_Browse.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="btn_Browse.Text" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="&gt;&gt;btn_Browse.Name" xml:space="preserve">
+    <value>btn_Browse</value>
+  </data>
+  <data name="&gt;&gt;btn_Browse.Type" xml:space="preserve">
+    <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;btn_Browse.Parent" xml:space="preserve">
+    <value>gb_ImportODBpp</value>
+  </data>
+  <data name="&gt;&gt;btn_Browse.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="btn_Refresh.Location" type="System.Drawing.Point, System.Drawing">
+    <value>653, 21</value>
+  </data>
+  <data name="btn_Refresh.Size" type="System.Drawing.Size, System.Drawing">
+    <value>88, 38</value>
+  </data>
+  <data name="btn_Refresh.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="btn_Refresh.Text" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="&gt;&gt;btn_Refresh.Name" xml:space="preserve">
+    <value>btn_Refresh</value>
+  </data>
+  <data name="&gt;&gt;btn_Refresh.Type" xml:space="preserve">
+    <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;btn_Refresh.Parent" xml:space="preserve">
+    <value>gb_ImportODBpp</value>
+  </data>
+  <data name="&gt;&gt;btn_Refresh.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="gb_ImportODBpp.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 12</value>
+  </data>
+  <data name="gb_ImportODBpp.Size" type="System.Drawing.Size, System.Drawing">
+    <value>760, 70</value>
+  </data>
+  <data name="gb_ImportODBpp.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="gb_ImportODBpp.Text" xml:space="preserve">
+    <value>Import ODB++ Design</value>
+  </data>
+  <data name="&gt;&gt;gb_ImportODBpp.Name" xml:space="preserve">
+    <value>gb_ImportODBpp</value>
+  </data>
+  <data name="&gt;&gt;gb_ImportODBpp.Type" xml:space="preserve">
+    <value>SRMControl.SRMGroupBox, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;gb_ImportODBpp.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;gb_ImportODBpp.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="lbl_Step.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbl_Step.Location" type="System.Drawing.Point, System.Drawing">
+    <value>16, 34</value>
+  </data>
+  <data name="lbl_Step.Size" type="System.Drawing.Size, System.Drawing">
+    <value>41, 17</value>
+  </data>
+  <data name="lbl_Step.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="lbl_Step.Text" xml:space="preserve">
+    <value>Step:</value>
+  </data>
+  <data name="&gt;&gt;lbl_Step.Name" xml:space="preserve">
+    <value>lbl_Step</value>
+  </data>
+  <data name="&gt;&gt;lbl_Step.Type" xml:space="preserve">
+    <value>SRMControl.SRMLabel, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;lbl_Step.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;lbl_Step.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="lbl_Layer.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbl_Layer.Location" type="System.Drawing.Point, System.Drawing">
+    <value>289, 34</value>
+  </data>
+  <data name="lbl_Layer.Size" type="System.Drawing.Size, System.Drawing">
+    <value>48, 17</value>
+  </data>
+  <data name="lbl_Layer.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="lbl_Layer.Text" xml:space="preserve">
+    <value>Layer:</value>
+  </data>
+  <data name="&gt;&gt;lbl_Layer.Name" xml:space="preserve">
+    <value>lbl_Layer</value>
+  </data>
+  <data name="&gt;&gt;lbl_Layer.Type" xml:space="preserve">
+    <value>SRMControl.SRMLabel, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;lbl_Layer.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;lbl_Layer.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="cbo_Step.Location" type="System.Drawing.Point, System.Drawing">
+    <value>63, 30</value>
+  </data>
+  <data name="cbo_Step.Size" type="System.Drawing.Size, System.Drawing">
+    <value>200, 23</value>
+  </data>
+  <data name="cbo_Step.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="&gt;&gt;cbo_Step.Name" xml:space="preserve">
+    <value>cbo_Step</value>
+  </data>
+  <data name="&gt;&gt;cbo_Step.Type" xml:space="preserve">
+    <value>SRMControl.SRMComboBox, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;cbo_Step.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;cbo_Step.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="cbo_Layer.Location" type="System.Drawing.Point, System.Drawing">
+    <value>343, 30</value>
+  </data>
+  <data name="cbo_Layer.Size" type="System.Drawing.Size, System.Drawing">
+    <value>200, 23</value>
+  </data>
+  <data name="cbo_Layer.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="&gt;&gt;cbo_Layer.Name" xml:space="preserve">
+    <value>cbo_Layer</value>
+  </data>
+  <data name="&gt;&gt;cbo_Layer.Type" xml:space="preserve">
+    <value>SRMControl.SRMComboBox, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;cbo_Layer.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;cbo_Layer.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="dgv_Data.Location" type="System.Drawing.Point, System.Drawing">
+    <value>19, 69</value>
+  </data>
+  <data name="dgv_Data.RowHeadersWidth" type="System.Int32, mscorlib">
+    <value>51</value>
+  </data>
+  <data name="dgv_Data.Size" type="System.Drawing.Size, System.Drawing">
+    <value>723, 273</value>
+  </data>
+  <data name="dgv_Data.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="&gt;&gt;dgv_Data.Name" xml:space="preserve">
+    <value>dgv_Data</value>
+  </data>
+  <data name="&gt;&gt;dgv_Data.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;dgv_Data.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;dgv_Data.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="lbl_Statistic.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbl_Statistic.Location" type="System.Drawing.Point, System.Drawing">
+    <value>16, 345</value>
+  </data>
+  <data name="lbl_Statistic.Size" type="System.Drawing.Size, System.Drawing">
+    <value>57, 17</value>
+  </data>
+  <data name="lbl_Statistic.TabIndex" type="System.Int32, mscorlib">
+    <value>11</value>
+  </data>
+  <data name="lbl_Statistic.Text" xml:space="preserve">
+    <value>Statistic</value>
+  </data>
+  <data name="&gt;&gt;lbl_Statistic.Name" xml:space="preserve">
+    <value>lbl_Statistic</value>
+  </data>
+  <data name="&gt;&gt;lbl_Statistic.Type" xml:space="preserve">
+    <value>SRMControl.SRMLabel, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;lbl_Statistic.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;lbl_Statistic.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="gb_Data.Location" type="System.Drawing.Point, System.Drawing">
+    <value>11, 88</value>
+  </data>
+  <data name="gb_Data.Size" type="System.Drawing.Size, System.Drawing">
+    <value>760, 377</value>
+  </data>
+  <data name="gb_Data.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="gb_Data.Text" xml:space="preserve">
+    <value>Component Data</value>
+  </data>
+  <data name="&gt;&gt;gb_Data.Name" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;gb_Data.Type" xml:space="preserve">
+    <value>SRMControl.SRMGroupBox, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;gb_Data.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;gb_Data.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="lbl_Status.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbl_Status.Location" type="System.Drawing.Point, System.Drawing">
+    <value>15, 32</value>
+  </data>
+  <data name="lbl_Status.Size" type="System.Drawing.Size, System.Drawing">
+    <value>48, 17</value>
+  </data>
+  <data name="lbl_Status.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="lbl_Status.Text" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="&gt;&gt;lbl_Status.Name" xml:space="preserve">
+    <value>lbl_Status</value>
+  </data>
+  <data name="&gt;&gt;lbl_Status.Type" xml:space="preserve">
+    <value>SRMControl.SRMLabel, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;lbl_Status.Parent" xml:space="preserve">
+    <value>gb_Export</value>
+  </data>
+  <data name="&gt;&gt;lbl_Status.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="btn_ExportLayer.Location" type="System.Drawing.Point, System.Drawing">
+    <value>416, 21</value>
+  </data>
+  <data name="btn_ExportLayer.Size" type="System.Drawing.Size, System.Drawing">
+    <value>160, 38</value>
+  </data>
+  <data name="btn_ExportLayer.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="btn_ExportLayer.Text" xml:space="preserve">
+    <value>Export Current Layer</value>
+  </data>
+  <data name="&gt;&gt;btn_ExportLayer.Name" xml:space="preserve">
+    <value>btn_ExportLayer</value>
+  </data>
+  <data name="&gt;&gt;btn_ExportLayer.Type" xml:space="preserve">
+    <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;btn_ExportLayer.Parent" xml:space="preserve">
+    <value>gb_Export</value>
+  </data>
+  <data name="&gt;&gt;btn_ExportLayer.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="btn_ExportAllLayer.Location" type="System.Drawing.Point, System.Drawing">
+    <value>582, 21</value>
+  </data>
+  <data name="btn_ExportAllLayer.Size" type="System.Drawing.Size, System.Drawing">
+    <value>160, 38</value>
+  </data>
+  <data name="btn_ExportAllLayer.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="btn_ExportAllLayer.Text" xml:space="preserve">
+    <value>Export All Layer</value>
+  </data>
+  <data name="&gt;&gt;btn_ExportAllLayer.Name" xml:space="preserve">
+    <value>btn_ExportAllLayer</value>
+  </data>
+  <data name="&gt;&gt;btn_ExportAllLayer.Type" xml:space="preserve">
+    <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;btn_ExportAllLayer.Parent" xml:space="preserve">
+    <value>gb_Export</value>
+  </data>
+  <data name="&gt;&gt;btn_ExportAllLayer.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="gb_Export.Location" type="System.Drawing.Point, System.Drawing">
+    <value>11, 471</value>
+  </data>
+  <data name="gb_Export.Size" type="System.Drawing.Size, System.Drawing">
+    <value>760, 70</value>
+  </data>
+  <data name="gb_Export.TabIndex" type="System.Int32, mscorlib">
+    <value>13</value>
+  </data>
+  <data name="gb_Export.Text" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="&gt;&gt;gb_Export.Name" xml:space="preserve">
+    <value>gb_Export</value>
+  </data>
+  <data name="&gt;&gt;gb_Export.Type" xml:space="preserve">
+    <value>SRMControl.SRMGroupBox, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;gb_Export.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;gb_Export.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="$this.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>120, 120</value>
+  </data>
+  <data name="$this.AutoScroll" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="$this.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>782, 553</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
+    <value>CenterScreen</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>ODB++ Extractor</value>
+  </data>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>ExtractorForm</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>
