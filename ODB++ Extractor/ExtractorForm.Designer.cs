@@ -18,6 +18,7 @@ namespace ODB___Extractor
             {
                 components.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -30,12 +31,12 @@ namespace ODB___Extractor
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExtractorForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.lbl_Path = new SRMControl.SRMLabel();
             this.txt_Path = new SRMControl.SRMInputBox();
-            this.btn_Browse = new SRMControl.SRMButton();
-            this.btn_Refresh = new SRMControl.SRMButton();
+            this.btn_BrowseDir = new SRMControl.SRMButton();
+            this.btn_BrowseFile = new SRMControl.SRMButton();
             this.gb_ImportODBpp = new SRMControl.SRMGroupBox();
             this.lbl_Step = new SRMControl.SRMLabel();
             this.lbl_Layer = new SRMControl.SRMLabel();
@@ -44,6 +45,7 @@ namespace ODB___Extractor
             this.dgv_Data = new System.Windows.Forms.DataGridView();
             this.lbl_Statistic = new SRMControl.SRMLabel();
             this.gb_Data = new SRMControl.SRMGroupBox();
+            this.btn_RefreshData = new SRMControl.SRMButton();
             this.gb_Export = new SRMControl.SRMGroupBox();
             this.lbl_Status = new SRMControl.SRMLabel();
             this.btn_ExportLayer = new SRMControl.SRMButton();
@@ -80,26 +82,26 @@ namespace ODB___Extractor
             this.txt_Path.NormalBackColor = System.Drawing.Color.White;
             this.txt_Path.TextChanged += new System.EventHandler(this.txt_Path_TextChanged);
             // 
-            // btn_Browse
+            // btn_BrowseDir
             // 
-            resources.ApplyResources(this.btn_Browse, "btn_Browse");
-            this.btn_Browse.Name = "btn_Browse";
-            this.btn_Browse.UseVisualStyleBackColor = true;
-            this.btn_Browse.Click += new System.EventHandler(this.btn_Browse_Click);
+            resources.ApplyResources(this.btn_BrowseDir, "btn_BrowseDir");
+            this.btn_BrowseDir.Name = "btn_BrowseDir";
+            this.btn_BrowseDir.UseVisualStyleBackColor = true;
+            this.btn_BrowseDir.Click += new System.EventHandler(this.btn_BrowseDir_Click);
             // 
-            // btn_Refresh
+            // btn_BrowseFile
             // 
-            resources.ApplyResources(this.btn_Refresh, "btn_Refresh");
-            this.btn_Refresh.Name = "btn_Refresh";
-            this.btn_Refresh.UseVisualStyleBackColor = true;
-            this.btn_Refresh.Click += new System.EventHandler(this.btn_Refresh_Click);
+            resources.ApplyResources(this.btn_BrowseFile, "btn_BrowseFile");
+            this.btn_BrowseFile.Name = "btn_BrowseFile";
+            this.btn_BrowseFile.UseVisualStyleBackColor = true;
+            this.btn_BrowseFile.Click += new System.EventHandler(this.btn_BrowseFile_Click);
             // 
             // gb_ImportODBpp
             // 
             this.gb_ImportODBpp.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(150)))), ((int)(((byte)(185)))));
-            this.gb_ImportODBpp.Controls.Add(this.btn_Refresh);
+            this.gb_ImportODBpp.Controls.Add(this.btn_BrowseFile);
             this.gb_ImportODBpp.Controls.Add(this.lbl_Path);
-            this.gb_ImportODBpp.Controls.Add(this.btn_Browse);
+            this.gb_ImportODBpp.Controls.Add(this.btn_BrowseDir);
             this.gb_ImportODBpp.Controls.Add(this.txt_Path);
             resources.ApplyResources(this.gb_ImportODBpp, "gb_ImportODBpp");
             this.gb_ImportODBpp.Name = "gb_ImportODBpp";
@@ -145,25 +147,25 @@ namespace ODB___Extractor
             this.dgv_Data.AllowUserToDeleteRows = false;
             this.dgv_Data.BackgroundColor = System.Drawing.Color.AliceBlue;
             this.dgv_Data.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle9.BackColor = System.Drawing.Color.LightSkyBlue;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgv_Data.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.LightSkyBlue;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgv_Data.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dgv_Data.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             resources.ApplyResources(this.dgv_Data, "dgv_Data");
             this.dgv_Data.Name = "dgv_Data";
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle10.BackColor = System.Drawing.Color.LightSkyBlue;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgv_Data.RowHeadersDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.LightSkyBlue;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgv_Data.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.dgv_Data.RowHeadersVisible = false;
             this.dgv_Data.RowTemplate.Height = 24;
             // 
@@ -176,6 +178,7 @@ namespace ODB___Extractor
             // gb_Data
             // 
             this.gb_Data.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(150)))), ((int)(((byte)(185)))));
+            this.gb_Data.Controls.Add(this.btn_RefreshData);
             this.gb_Data.Controls.Add(this.lbl_Statistic);
             this.gb_Data.Controls.Add(this.dgv_Data);
             this.gb_Data.Controls.Add(this.lbl_Step);
@@ -185,6 +188,13 @@ namespace ODB___Extractor
             resources.ApplyResources(this.gb_Data, "gb_Data");
             this.gb_Data.Name = "gb_Data";
             this.gb_Data.TabStop = false;
+            // 
+            // btn_RefreshData
+            // 
+            resources.ApplyResources(this.btn_RefreshData, "btn_RefreshData");
+            this.btn_RefreshData.Name = "btn_RefreshData";
+            this.btn_RefreshData.UseVisualStyleBackColor = true;
+            this.btn_RefreshData.Click += new System.EventHandler(this.btn_RefreshData_Click);
             // 
             // gb_Export
             // 
@@ -244,8 +254,8 @@ namespace ODB___Extractor
 
         private SRMControl.SRMLabel lbl_Path;
         private SRMControl.SRMInputBox txt_Path;
-        private SRMControl.SRMButton btn_Browse;
-        private SRMControl.SRMButton btn_Refresh;
+        private SRMControl.SRMButton btn_BrowseDir;
+        private SRMControl.SRMButton btn_BrowseFile;
         private SRMControl.SRMGroupBox gb_ImportODBpp;
         private SRMControl.SRMLabel lbl_Step;
         private SRMControl.SRMLabel lbl_Layer;
@@ -258,6 +268,6 @@ namespace ODB___Extractor
         private SRMControl.SRMLabel lbl_Status;
         private SRMControl.SRMButton btn_ExportLayer;
         private SRMControl.SRMButton btn_ExportAllLayer;
+        private SRMControl.SRMButton btn_RefreshData;
     }
 }
-

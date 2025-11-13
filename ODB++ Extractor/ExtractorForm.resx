@@ -150,7 +150,7 @@
     <value>62, 29</value>
   </data>
   <data name="txt_Path.Size" type="System.Drawing.Size, System.Drawing">
-    <value>480, 22</value>
+    <value>428, 22</value>
   </data>
   <data name="txt_Path.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -170,52 +170,56 @@
   <data name="&gt;&gt;txt_Path.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
-  <data name="btn_Browse.Location" type="System.Drawing.Point, System.Drawing">
-    <value>559, 21</value>
+  <data name="btn_BrowseDir.Location" type="System.Drawing.Point, System.Drawing">
+    <value>505, 21</value>
   </data>
-  <data name="btn_Browse.Size" type="System.Drawing.Size, System.Drawing">
-    <value>88, 38</value>
+  <data name="btn_BrowseDir.Size" type="System.Drawing.Size, System.Drawing">
+    <value>130, 38</value>
   </data>
-  <data name="btn_Browse.TabIndex" type="System.Int32, mscorlib">
+  <data name="btn_BrowseDir.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
   </data>
-  <data name="btn_Browse.Text" xml:space="preserve">
-    <value>Browse</value>
+  <data name="btn_BrowseDir.Text" xml:space="preserve">
+    <value>Browse Directory</value>
   </data>
-  <data name="&gt;&gt;btn_Browse.Name" xml:space="preserve">
-    <value>btn_Browse</value>
+  <data name="&gt;&gt;btn_BrowseDir.Name" xml:space="preserve">
+    <value>btn_BrowseDir</value>
   </data>
-  <data name="&gt;&gt;btn_Browse.Type" xml:space="preserve">
+  <data name="&gt;&gt;btn_BrowseDir.Type" xml:space="preserve">
     <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
   </data>
-  <data name="&gt;&gt;btn_Browse.Parent" xml:space="preserve">
+  <data name="&gt;&gt;btn_BrowseDir.Parent" xml:space="preserve">
     <value>gb_ImportODBpp</value>
   </data>
-  <data name="&gt;&gt;btn_Browse.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;btn_BrowseDir.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <data name="btn_Refresh.Location" type="System.Drawing.Point, System.Drawing">
-    <value>653, 21</value>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="btn_BrowseFile.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
-  <data name="btn_Refresh.Size" type="System.Drawing.Size, System.Drawing">
-    <value>88, 38</value>
+  <data name="btn_BrowseFile.Location" type="System.Drawing.Point, System.Drawing">
+    <value>641, 21</value>
   </data>
-  <data name="btn_Refresh.TabIndex" type="System.Int32, mscorlib">
+  <data name="btn_BrowseFile.Size" type="System.Drawing.Size, System.Drawing">
+    <value>100, 38</value>
+  </data>
+  <data name="btn_BrowseFile.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
   </data>
-  <data name="btn_Refresh.Text" xml:space="preserve">
-    <value>Refresh</value>
+  <data name="btn_BrowseFile.Text" xml:space="preserve">
+    <value>Browse File</value>
   </data>
-  <data name="&gt;&gt;btn_Refresh.Name" xml:space="preserve">
-    <value>btn_Refresh</value>
+  <data name="&gt;&gt;btn_BrowseFile.Name" xml:space="preserve">
+    <value>btn_BrowseFile</value>
   </data>
-  <data name="&gt;&gt;btn_Refresh.Type" xml:space="preserve">
+  <data name="&gt;&gt;btn_BrowseFile.Type" xml:space="preserve">
     <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
   </data>
-  <data name="&gt;&gt;btn_Refresh.Parent" xml:space="preserve">
+  <data name="&gt;&gt;btn_BrowseFile.Parent" xml:space="preserve">
     <value>gb_ImportODBpp</value>
   </data>
-  <data name="&gt;&gt;btn_Refresh.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;btn_BrowseFile.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <data name="gb_ImportODBpp.Location" type="System.Drawing.Point, System.Drawing">
@@ -267,7 +271,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Step.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="lbl_Layer.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -294,7 +298,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Layer.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>5</value>
   </data>
   <data name="cbo_Step.Location" type="System.Drawing.Point, System.Drawing">
     <value>63, 30</value>
@@ -315,7 +319,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;cbo_Step.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>6</value>
   </data>
   <data name="cbo_Layer.Location" type="System.Drawing.Point, System.Drawing">
     <value>343, 30</value>
@@ -336,7 +340,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;cbo_Layer.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="dgv_Data.Location" type="System.Drawing.Point, System.Drawing">
     <value>19, 69</value>
@@ -360,7 +364,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;dgv_Data.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="lbl_Statistic.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -387,6 +391,33 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Statistic.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="btn_RefreshData.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btn_RefreshData.Location" type="System.Drawing.Point, System.Drawing">
+    <value>662, 21</value>
+  </data>
+  <data name="btn_RefreshData.Size" type="System.Drawing.Size, System.Drawing">
+    <value>80, 38</value>
+  </data>
+  <data name="btn_RefreshData.TabIndex" type="System.Int32, mscorlib">
+    <value>13</value>
+  </data>
+  <data name="btn_RefreshData.Text" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="&gt;&gt;btn_RefreshData.Name" xml:space="preserve">
+    <value>btn_RefreshData</value>
+  </data>
+  <data name="&gt;&gt;btn_RefreshData.Type" xml:space="preserve">
+    <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;btn_RefreshData.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;btn_RefreshData.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <data name="gb_Data.Location" type="System.Drawing.Point, System.Drawing">
@@ -441,7 +472,7 @@
     <value>0</value>
   </data>
   <data name="btn_ExportLayer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>416, 21</value>
+    <value>446, 21</value>
   </data>
   <data name="btn_ExportLayer.Size" type="System.Drawing.Size, System.Drawing">
     <value>160, 38</value>
@@ -465,10 +496,10 @@
     <value>1</value>
   </data>
   <data name="btn_ExportAllLayer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>582, 21</value>
+    <value>612, 21</value>
   </data>
   <data name="btn_ExportAllLayer.Size" type="System.Drawing.Size, System.Drawing">
-    <value>160, 38</value>
+    <value>130, 38</value>
   </data>
   <data name="btn_ExportAllLayer.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -530,7 +561,6 @@
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>782, 553</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
     <value>CenterScreen</value>
   </data>
