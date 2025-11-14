@@ -88,12 +88,17 @@ namespace ODB___Extractor
 
         private void BrowseFolder()
         {
-            using (var dialog = new FolderBrowserDialog())
+            var initialPath = ResolveInitialFolder(txt_Path.Text);
+            using (var browser = new BetterFolderBrowser
             {
-                SetFolderBrowserSelectedPath(dialog, txt_Path.Text);
-                if (dialog.ShowDialog(this) == DialogResult.OK)
+                Title = "Select folder",
+                Multiselect = false,
+                RootFolder = string.IsNullOrWhiteSpace(initialPath) ? null : initialPath
+            })
+            {
+                if (browser.ShowDialog(this) == DialogResult.OK)
                 {
-                    txt_Path.Text = dialog.SelectedPath;
+                    txt_Path.Text = browser.SelectedPath;
                 }
             }
         }
@@ -122,11 +127,11 @@ namespace ODB___Extractor
             }
         }
 
-        private static void SetFolderBrowserSelectedPath(FolderBrowserDialog dialog, string path)
+        private static string ResolveInitialFolder(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
-                return;
+                return string.Empty;
             }
 
             try
@@ -137,13 +142,15 @@ namespace ODB___Extractor
 
                 if (!string.IsNullOrWhiteSpace(candidate) && Directory.Exists(candidate))
                 {
-                    dialog.SelectedPath = candidate;
+                    return candidate;
                 }
             }
             catch
             {
                 // ignore invalid paths
             }
+
+            return string.Empty;
         }
 
         private void cbo_Step_SelectedIndexChanged(object sender, EventArgs e)
