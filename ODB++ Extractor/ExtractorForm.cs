@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -9,7 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Diagnostics;
 
 namespace ODB___Extractor
 {
@@ -22,6 +22,7 @@ namespace ODB___Extractor
         private bool _isLoading;
         private ODBppExtractor.JobReport _currentJobReport;
         private IReadOnlyList<ODBppExtractor.ComponentPlacementInfo> _topLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
+        private IReadOnlyList<ODBppExtractor.ComponentPlacementInfo> _bottomLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
         private readonly string _workingDirectoryRoot;
 
         public ExtractorForm()
@@ -29,6 +30,7 @@ namespace ODB___Extractor
             InitializeComponent();
             InitializeDataGrid();
             ResetUi();
+            InitializeOriginCombo();
             _workingDirectoryRoot = EnsureWorkingDirectory();
         }
 
@@ -272,7 +274,8 @@ namespace ODB___Extractor
                 }
 
                 _currentJobReport = result.JobReport;
-                _topLeftPlacementData = ODBppExtractor.GetTopLeftComponentPlacements(_currentJobReport) ?? Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
+                _topLeftPlacementData = ODBppExtractor.GetComponentPlacements(_currentJobReport, topLeft: true);
+                _bottomLeftPlacementData = ODBppExtractor.GetComponentPlacements(_currentJobReport, topLeft: false);
                 if (_currentJobReport?.Steps == null || _currentJobReport.Steps.Count == 0)
                 {
                     ResetUi("No steps were found in the ODB++ job.");
@@ -343,6 +346,7 @@ namespace ODB___Extractor
             dgv_Data.Rows.Clear();
             var stepText = BuildStepDimensionText(step);
             var unitText = DetermineLayerUnit(step, layer);
+            var originLabel = GetCurrentOriginLabel();
 
             if (step == null || layer == null)
             {
@@ -358,7 +362,7 @@ namespace ODB___Extractor
                 return;
             }
 
-            var placements = (_topLeftPlacementData ?? Array.Empty<ODBppExtractor.ComponentPlacementInfo>())
+            var placements = (GetCurrentPlacementData() ?? Array.Empty<ODBppExtractor.ComponentPlacementInfo>())
                 .Where(info =>
                     string.Equals(info.Step, step.Name, StringComparison.OrdinalIgnoreCase)
                     && string.Equals(info.Layer, layer.Name, StringComparison.OrdinalIgnoreCase))
@@ -367,7 +371,7 @@ namespace ODB___Extractor
             if (placements.Count == 0)
             {
                 lbl_Statistic.Text = $"{stepText} • Unit: {unitText} • Components count: 0";
-                lbl_Status.Text = $"Layer '{layer.Name}' contains no components.";
+                lbl_Status.Text = $"Layer '{layer.Name}' ({originLabel}) contains no components.";
                 return;
             }
 
@@ -384,7 +388,7 @@ namespace ODB___Extractor
             }
 
             lbl_Statistic.Text = $"{stepText} • Unit: {unitText} • Components count: {placements.Count}";
-            lbl_Status.Text = $"Layer '{layer.Name}' (top-left) contains {placements.Count} components.";
+            lbl_Status.Text = $"Layer '{layer.Name}' ({originLabel}) contains {placements.Count} components.";
         }
 
         private void ShowError(string message)
@@ -400,6 +404,7 @@ namespace ODB___Extractor
         {
             _currentJobReport = null;
             _topLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
+            _bottomLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
             ClearVisuals();
             lbl_Status.Text = statusMessage;
         }
@@ -433,6 +438,7 @@ namespace ODB___Extractor
             btn_RefreshData.Enabled = enabled;
             btn_ExportLayer.Enabled = enabled;
             btn_ExportAllLayer.Enabled = enabled;
+            cbo_Origin.Enabled = enabled;
         }
 
         private static string BuildStepDimensionText(ODBppExtractor.StepReport step)
@@ -471,6 +477,7 @@ namespace ODB___Extractor
         {
             _suspendSelection = true;
             _topLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
+            _bottomLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
             cbo_Step.DataSource = null;
             cbo_Layer.DataSource = null;
             cbo_Step.Enabled = false;
@@ -480,11 +487,44 @@ namespace ODB___Extractor
             _suspendSelection = false;
         }
 
+        private void InitializeOriginCombo()
+        {
+            _suspendSelection = true;
+            cbo_Origin.Items.Clear();
+            cbo_Origin.Items.Add("Top-left");
+            cbo_Origin.Items.Add("Bottom-left");
+            cbo_Origin.SelectedIndex = 0;
+            _suspendSelection = false;
+        }
+
+        private IReadOnlyList<ODBppExtractor.ComponentPlacementInfo> GetCurrentPlacementData()
+        {
+            return IsOriginBottomLeftSelected() ? _bottomLeftPlacementData : _topLeftPlacementData;
+        }
+
+        private string GetCurrentOriginLabel() =>
+            IsOriginBottomLeftSelected() ? "bottom-left" : "top-left";
+
+        private bool IsOriginBottomLeftSelected() =>
+            cbo_Origin.SelectedIndex == 1;
+
         private static string EnsureWorkingDirectory()
         {
             var tempDir = Path.Combine(Path.GetTempPath(), "ODBppExtractorTemp");
             Directory.CreateDirectory(tempDir);
             return tempDir;
+        }
+
+        private void cbo_Origin_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_suspendSelection)
+            {
+                return;
+            }
+
+            var step = cbo_Step.SelectedItem as ODBppExtractor.StepReport;
+            var layer = cbo_Layer.SelectedItem as ODBppExtractor.LayerReport;
+            DisplayLayerComponents(step, layer);
         }
     }
 }

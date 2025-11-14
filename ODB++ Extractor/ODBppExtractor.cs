@@ -1646,14 +1646,18 @@ namespace ODB___Extractor
             return stepElements;
         }
 
-        public static IReadOnlyList<ComponentPlacementInfo> GetTopLeftComponentPlacements(JobReport report)
+        public static IReadOnlyList<ComponentPlacementInfo> GetTopLeftComponentPlacements(JobReport report) =>
+            GetComponentPlacements(report, topLeft: true);
+
+        public static IReadOnlyList<ComponentPlacementInfo> GetComponentPlacements(JobReport report, bool topLeft)
         {
             if (report == null)
             {
                 return Array.Empty<ComponentPlacementInfo>();
             }
 
-            var entries = BuildComponentPlacementEntries(report, CoordinateOrigin.TopLeft, null);
+            var origin = topLeft ? CoordinateOrigin.TopLeft : CoordinateOrigin.BottomLeft;
+            var entries = BuildComponentPlacementEntries(report, origin, null);
             var placements = new List<ComponentPlacementInfo>(entries.Count);
             foreach (var entry in entries)
             {
