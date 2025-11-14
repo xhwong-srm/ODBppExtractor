@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace ODB___Extractor
 {
@@ -21,12 +22,14 @@ namespace ODB___Extractor
         private bool _isLoading;
         private ODBppExtractor.JobReport _currentJobReport;
         private IReadOnlyList<ODBppExtractor.ComponentPlacementInfo> _topLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
+        private readonly string _workingDirectoryRoot;
 
         public ExtractorForm()
         {
             InitializeComponent();
             InitializeDataGrid();
             ResetUi();
+            _workingDirectoryRoot = EnsureWorkingDirectory();
         }
 
         private void btn_BrowseDir_Click(object sender, EventArgs e)
@@ -254,7 +257,13 @@ namespace ODB___Extractor
 
             try
             {
-                var result = await Task.Run(() => ODBppExtractor.Extract(path));
+                var exportPreferences = new ODBppExtractor.ExportPreferences
+                {
+                    ExportJobReport = false,
+                    ComponentMode = ODBppExtractor.ComponentExportMode.None
+                };
+
+                var result = await Task.Run(() => ODBppExtractor.Extract(path, _workingDirectoryRoot, exportPreferences));
                 if (!result.IsSuccessful)
                 {
                     ShowError(result.ErrorMessage ?? "Failed to load ODB++ job.");
@@ -469,6 +478,13 @@ namespace ODB___Extractor
             dgv_Data.Rows.Clear();
             lbl_Statistic.Text = DefaultStatisticText;
             _suspendSelection = false;
+        }
+
+        private static string EnsureWorkingDirectory()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), "ODBppExtractorTemp");
+            Directory.CreateDirectory(tempDir);
+            return tempDir;
         }
     }
 }

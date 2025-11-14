@@ -334,7 +334,7 @@ namespace ODB___Extractor
         /// </summary>
         /// <param name="inputPath">Path to a supported archive (.tgz, .tar.gz, .tar, .zip) or already-extracted job directory.</param>
         /// <returns>Success metadata plus references to the generated XML reports, or an error payload.</returns>
-        public static ExtractionResult Extract(string inputPath, ExportPreferences exportPreferences = null)
+        public static ExtractionResult Extract(string inputPath, string workingDirectory = null, ExportPreferences exportPreferences = null)
         {
             if (string.IsNullOrWhiteSpace(inputPath))
             {
@@ -347,8 +347,12 @@ namespace ODB___Extractor
             }
 
             string extractDir = string.Empty;
-            var tempRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp");
-            Directory.CreateDirectory(tempRoot);
+            var resolvedWorkingDirectory = ResolveWorkingDirectory(workingDirectory);
+            Directory.CreateDirectory(resolvedWorkingDirectory);
+            var odbppFilesRoot = Path.Combine(resolvedWorkingDirectory, "odbpp-files");
+            Directory.CreateDirectory(odbppFilesRoot);
+            var reportsDir = Path.Combine(resolvedWorkingDirectory, "reports");
+            Directory.CreateDirectory(reportsDir);
             var extracted = false;
             var shouldCleanTempDir = false;
 
@@ -374,7 +378,7 @@ namespace ODB___Extractor
                         archiveBaseName = Path.GetFileNameWithoutExtension(archiveBaseName);
                     }
 
-                    extractDir = Path.Combine(tempRoot, $"{archiveBaseName}_{DateTime.Now:yyyyMMddHHmmss}");
+                    extractDir = Path.Combine(odbppFilesRoot, $"{archiveBaseName}_{DateTime.Now:yyyyMMddHHmmss}");
                     Directory.CreateDirectory(extractDir);
                     shouldCleanTempDir = true;
 
@@ -417,7 +421,7 @@ namespace ODB___Extractor
                     exportPreferences.ComponentLayerFilter = selectedLayers ?? Array.Empty<string>();
                 }
 
-                var jobReportPath = exportPreferences.ExportJobReport ? SaveJobReport(jobReport) : string.Empty;
+                var jobReportPath = exportPreferences.ExportJobReport ? SaveJobReport(jobReport, reportsDir) : string.Empty;
                 var componentReportPaths = new List<string>();
                 var topLeftComponentReportPaths = new List<string>();
                 HashSet<string> layerFilter = null;
@@ -433,14 +437,14 @@ namespace ODB___Extractor
                 switch (exportPreferences.ComponentMode)
                 {
                     case ComponentExportMode.BottomLeft:
-                        componentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.BottomLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter));
+                        componentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.BottomLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir));
                         break;
                     case ComponentExportMode.TopLeft:
-                        topLeftComponentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.TopLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter));
+                        topLeftComponentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.TopLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir));
                         break;
                     case ComponentExportMode.Both:
-                        componentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.BottomLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter));
-                        topLeftComponentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.TopLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter));
+                        componentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.BottomLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir));
+                        topLeftComponentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.TopLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir));
                         break;
                     case ComponentExportMode.None:
                         break;
@@ -460,20 +464,43 @@ namespace ODB___Extractor
                 LogInfo(ex.ToString());
                 return ExtractionResult.Failure(ex.Message, inputPath, null);
             }
-            finally
+        finally
+        {
+            if (shouldCleanTempDir && !string.IsNullOrEmpty(extractDir) && Directory.Exists(extractDir))
             {
-                if (shouldCleanTempDir && !string.IsNullOrEmpty(extractDir) && Directory.Exists(extractDir))
+                try
                 {
-                    try
-                    {
-                        Directory.Delete(extractDir, true);
-                        LogInfo($"Deleted temporary extraction folder: {extractDir}");
-                    }
-                    catch (Exception cleanupEx)
-                    {
-                        LogInfo($"Failed to delete temporary extraction folder {extractDir}: {cleanupEx.Message}");
-                    }
+                    Directory.Delete(extractDir, true);
+                    LogInfo($"Deleted temporary extraction folder: {extractDir}");
                 }
+                catch (Exception cleanupEx)
+                {
+                    LogInfo($"Failed to delete temporary extraction folder {extractDir}: {cleanupEx.Message}");
+                }
+            }
+        }
+    }
+
+        private static string ResolveWorkingDirectory(string workingDirectory)
+        {
+            if (string.IsNullOrWhiteSpace(workingDirectory))
+            {
+                return AppDomain.CurrentDomain.BaseDirectory;
+            }
+
+            try
+            {
+                var expanded = Environment.ExpandEnvironmentVariables(workingDirectory.Trim().Trim('"'));
+                if (string.IsNullOrWhiteSpace(expanded))
+                {
+                    return AppDomain.CurrentDomain.BaseDirectory;
+                }
+
+                return Path.GetFullPath(expanded);
+            }
+            catch
+            {
+                return AppDomain.CurrentDomain.BaseDirectory;
             }
         }
 
@@ -1395,9 +1422,8 @@ namespace ODB___Extractor
             return "[" + string.Join("; ", polygon.Select(point => $"[{string.Join(",", point)}]")) + "]";
         }
 
-        private static string SaveJobReport(JobReport report)
+        private static string SaveJobReport(JobReport report, string reportsDir)
         {
-            var reportsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "reports");
             Directory.CreateDirectory(reportsDir);
             var archiveName = string.IsNullOrEmpty(report.SourceArchive) ? "job" : Path.GetFileNameWithoutExtension(report.SourceArchive);
             var baseName = SanitizeFileName(archiveName);
@@ -1420,7 +1446,7 @@ namespace ODB___Extractor
             return filePath;
         }
 
-        private static IReadOnlyList<string> SaveComponentPlacementReport(JobReport report, CoordinateOrigin origin, bool separateByLayer, HashSet<string> layerFilter)
+        private static IReadOnlyList<string> SaveComponentPlacementReport(JobReport report, CoordinateOrigin origin, bool separateByLayer, HashSet<string> layerFilter, string reportsDir)
         {
             if (!separateByLayer)
             {
@@ -1431,7 +1457,7 @@ namespace ODB___Extractor
                     return Array.Empty<string>();
                 }
 
-                var filePath = SaveComponentPlacementDocument(report, origin, "_components", layerElements);
+                var filePath = SaveComponentPlacementDocument(report, origin, "_components", layerElements, reportsDir);
                 return new[] { filePath };
             }
 
@@ -1469,7 +1495,7 @@ namespace ODB___Extractor
                     continue;
                 }
 
-                var filePath = SaveComponentPlacementDocument(report, origin, uniqueSuffix, layerElements, layerName);
+                var filePath = SaveComponentPlacementDocument(report, origin, uniqueSuffix, layerElements, reportsDir, layerName);
                 filePaths.Add(filePath);
             }
 
@@ -1481,9 +1507,9 @@ namespace ODB___Extractor
             CoordinateOrigin origin,
             string suffix,
             IReadOnlyList<XElement> stepElements,
+            string reportsDir,
             string layerName = null)
         {
-            var reportsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "reports");
             Directory.CreateDirectory(reportsDir);
             var archiveName = string.IsNullOrEmpty(report.SourceArchive) ? "job" : Path.GetFileNameWithoutExtension(report.SourceArchive);
             var baseName = SanitizeFileName(archiveName);
