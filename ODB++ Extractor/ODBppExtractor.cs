@@ -1620,6 +1620,49 @@ namespace ODB___Extractor
             return stepElements;
         }
 
+        public static IReadOnlyList<ComponentPlacementInfo> GetTopLeftComponentPlacements(JobReport report)
+        {
+            if (report == null)
+            {
+                return Array.Empty<ComponentPlacementInfo>();
+            }
+
+            var entries = BuildComponentPlacementEntries(report, CoordinateOrigin.TopLeft, null);
+            var placements = new List<ComponentPlacementInfo>(entries.Count);
+            foreach (var entry in entries)
+            {
+                var placement = ConvertToPlacementInfo(entry);
+                if (placement != null)
+                {
+                    placements.Add(placement);
+                }
+            }
+
+            return placements;
+        }
+
+        private static ComponentPlacementInfo ConvertToPlacementInfo(LayerComponentEntry entry)
+        {
+            var componentElement = entry?.Component;
+            if (componentElement == null)
+            {
+                return null;
+            }
+
+            string AttributeValue(string name) => componentElement.Attribute(name)?.Value ?? string.Empty;
+
+            return new ComponentPlacementInfo(
+                entry.Step,
+                entry.Layer,
+                AttributeValue("name"),
+                AttributeValue("packageName"),
+                AttributeValue("rotation"),
+                AttributeValue("centerX"),
+                AttributeValue("centerY"),
+                AttributeValue("width"),
+                AttributeValue("length"));
+        }
+
         private static bool IsLayerAllowed(string layerName, HashSet<string> layerFilter)
         {
             if (layerFilter == null || layerFilter.Count == 0)
@@ -1747,6 +1790,32 @@ namespace ODB___Extractor
             public string StepUnit { get; }
             public double? StepWidth { get; }
             public double? StepLength { get; }
+        }
+
+        public sealed class ComponentPlacementInfo
+        {
+            public ComponentPlacementInfo(string step, string layer, string componentName, string packageName, string rotation, string centerX, string centerY, string width, string length)
+            {
+                Step = step ?? string.Empty;
+                Layer = layer ?? string.Empty;
+                ComponentName = componentName ?? string.Empty;
+                PackageName = packageName ?? string.Empty;
+                Rotation = rotation ?? string.Empty;
+                CenterX = centerX ?? string.Empty;
+                CenterY = centerY ?? string.Empty;
+                Width = width ?? string.Empty;
+                Length = length ?? string.Empty;
+            }
+
+            public string Step { get; }
+            public string Layer { get; }
+            public string ComponentName { get; }
+            public string PackageName { get; }
+            public string Rotation { get; }
+            public string CenterX { get; }
+            public string CenterY { get; }
+            public string Width { get; }
+            public string Length { get; }
         }
 
         private sealed class ComponentPlacementResult

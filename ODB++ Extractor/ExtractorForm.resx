@@ -271,13 +271,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Step.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>5</value>
   </data>
   <data name="lbl_Layer.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="lbl_Layer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>289, 34</value>
+    <value>226, 34</value>
   </data>
   <data name="lbl_Layer.Size" type="System.Drawing.Size, System.Drawing">
     <value>48, 17</value>
@@ -298,13 +298,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Layer.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>7</value>
   </data>
   <data name="cbo_Step.Location" type="System.Drawing.Point, System.Drawing">
-    <value>63, 30</value>
+    <value>63, 31</value>
   </data>
   <data name="cbo_Step.Size" type="System.Drawing.Size, System.Drawing">
-    <value>200, 23</value>
+    <value>130, 23</value>
   </data>
   <data name="cbo_Step.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -319,13 +319,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;cbo_Step.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>8</value>
   </data>
   <data name="cbo_Layer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>343, 30</value>
+    <value>280, 31</value>
   </data>
   <data name="cbo_Layer.Size" type="System.Drawing.Size, System.Drawing">
-    <value>200, 23</value>
+    <value>140, 23</value>
   </data>
   <data name="cbo_Layer.TabIndex" type="System.Int32, mscorlib">
     <value>9</value>
@@ -340,7 +340,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;cbo_Layer.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>6</value>
   </data>
   <data name="dgv_Data.Location" type="System.Drawing.Point, System.Drawing">
     <value>19, 69</value>
@@ -364,7 +364,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;dgv_Data.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>4</value>
   </data>
   <data name="lbl_Statistic.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -391,6 +391,57 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Statistic.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="cbo_Origin.Location" type="System.Drawing.Point, System.Drawing">
+    <value>506, 31</value>
+  </data>
+  <data name="cbo_Origin.Size" type="System.Drawing.Size, System.Drawing">
+    <value>130, 23</value>
+  </data>
+  <data name="cbo_Origin.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
+  </data>
+  <data name="&gt;&gt;cbo_Origin.Name" xml:space="preserve">
+    <value>cbo_Origin</value>
+  </data>
+  <data name="&gt;&gt;cbo_Origin.Type" xml:space="preserve">
+    <value>SRMControl.SRMComboBox, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;cbo_Origin.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;cbo_Origin.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbl_Origin.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbl_Origin.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lbl_Origin.Location" type="System.Drawing.Point, System.Drawing">
+    <value>452, 34</value>
+  </data>
+  <data name="lbl_Origin.Size" type="System.Drawing.Size, System.Drawing">
+    <value>50, 17</value>
+  </data>
+  <data name="lbl_Origin.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
+  </data>
+  <data name="lbl_Origin.Text" xml:space="preserve">
+    <value>Origin:</value>
+  </data>
+  <data name="&gt;&gt;lbl_Origin.Name" xml:space="preserve">
+    <value>lbl_Origin</value>
+  </data>
+  <data name="&gt;&gt;lbl_Origin.Type" xml:space="preserve">
+    <value>SRMControl.SRMLabel, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;lbl_Origin.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;lbl_Origin.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
   <data name="btn_RefreshData.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
@@ -418,7 +469,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;btn_RefreshData.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>2</value>
   </data>
   <data name="gb_Data.Location" type="System.Drawing.Point, System.Drawing">
     <value>11, 88</value>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,11 +15,12 @@ namespace ODB___Extractor
     public partial class ExtractorForm : Form
     {
         private const string DefaultStatusText = "Waiting for an ODB++ archive or directory.";
-        private const string DefaultStatisticText = "No component data loaded.";
+        private const string DefaultStatisticText = "No component data loaded (top-left).";
 
         private bool _suspendSelection;
         private bool _isLoading;
         private ODBppExtractor.JobReport _currentJobReport;
+        private IReadOnlyList<ODBppExtractor.ComponentPlacementInfo> _topLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
 
         public ExtractorForm()
         {
@@ -187,6 +189,7 @@ namespace ODB___Extractor
             }
 
             lbl_Status.Text = $"Step '{step.Name}' selected ({step.Layers.Count} layer(s)).";
+            lbl_Statistic.Text = BuildStepDimensionText(step);
             PopulateLayerCombo(step);
         }
 
@@ -197,8 +200,9 @@ namespace ODB___Extractor
                 return;
             }
 
+            var step = cbo_Step.SelectedItem as ODBppExtractor.StepReport;
             var layer = cbo_Layer.SelectedItem as ODBppExtractor.LayerReport;
-            DisplayLayerComponents(layer);
+            DisplayLayerComponents(step, layer);
         }
 
         private void InitializeDataGrid()
@@ -206,13 +210,16 @@ namespace ODB___Extractor
             dgv_Data.AutoGenerateColumns = false;
             dgv_Data.ReadOnly = true;
             dgv_Data.Columns.Clear();
-            dgv_Data.Columns.Add(CreateTextColumn("ComponentName", "Component", DataGridViewAutoSizeColumnMode.Fill));
-            dgv_Data.Columns.Add(CreateTextColumn("PartName", "Part", DataGridViewAutoSizeColumnMode.Fill));
-            dgv_Data.Columns.Add(CreateTextColumn("PkgRef", "Pkg Ref", DataGridViewAutoSizeColumnMode.AllCells));
-            dgv_Data.Columns.Add(CreateTextColumn("X", "X", DataGridViewAutoSizeColumnMode.AllCells));
-            dgv_Data.Columns.Add(CreateTextColumn("Y", "Y", DataGridViewAutoSizeColumnMode.AllCells));
-            dgv_Data.Columns.Add(CreateTextColumn("Rot", "Rot", DataGridViewAutoSizeColumnMode.AllCells));
-            dgv_Data.Columns.Add(CreateTextColumn("Mirror", "Mirror", DataGridViewAutoSizeColumnMode.AllCells));
+            var componentColumn = CreateTextColumn("ComponentName", "Component", DataGridViewAutoSizeColumnMode.Fill);
+            componentColumn.MinimumWidth = 200;
+            componentColumn.FillWeight = 2f;
+            dgv_Data.Columns.Add(componentColumn);
+            dgv_Data.Columns.Add(CreateTextColumn("PackageName", "Package", DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("CenterX", "Center X", DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("CenterY", "Center Y", DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("Rotation", "Rotation", DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("Width", "Width", DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("Length", "Length", DataGridViewAutoSizeColumnMode.AllCells));
         }
 
         private static DataGridViewTextBoxColumn CreateTextColumn(string name, string header, DataGridViewAutoSizeColumnMode mode)
@@ -256,6 +263,7 @@ namespace ODB___Extractor
                 }
 
                 _currentJobReport = result.JobReport;
+                _topLeftPlacementData = ODBppExtractor.GetTopLeftComponentPlacements(_currentJobReport) ?? Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
                 if (_currentJobReport?.Steps == null || _currentJobReport.Steps.Count == 0)
                 {
                     ResetUi("No steps were found in the ODB++ job.");
@@ -302,7 +310,6 @@ namespace ODB___Extractor
             _suspendSelection = true;
             cbo_Layer.DataSource = null;
             dgv_Data.Rows.Clear();
-            lbl_Statistic.Text = DefaultStatisticText;
             cbo_Layer.Enabled = false;
             _suspendSelection = false;
 
@@ -322,49 +329,53 @@ namespace ODB___Extractor
             HandleLayerSelectionChange();
         }
 
-        private void DisplayLayerComponents(ODBppExtractor.LayerReport layer)
+        private void DisplayLayerComponents(ODBppExtractor.StepReport step, ODBppExtractor.LayerReport layer)
         {
             dgv_Data.Rows.Clear();
+            var stepText = BuildStepDimensionText(step);
+            var unitText = DetermineLayerUnit(step, layer);
 
-            if (layer == null)
+            if (step == null || layer == null)
             {
-                lbl_Statistic.Text = DefaultStatisticText;
+                lbl_Statistic.Text = $"{stepText} • Unit: {unitText} • Components count: 0";
                 lbl_Status.Text = "Select a layer to view data.";
                 return;
             }
 
             if (!layer.Exists)
             {
-                lbl_Statistic.Text = "Layer folder is missing.";
+                lbl_Statistic.Text = $"{stepText} • Unit: {unitText} • Components count: 0";
                 lbl_Status.Text = $"Layer '{layer.Name}' was not found on disk.";
                 return;
             }
 
-            var records = layer.Components?.Records ?? Array.Empty<ODBppExtractor.ComponentRecord>();
-            if (records.Count == 0)
+            var placements = (_topLeftPlacementData ?? Array.Empty<ODBppExtractor.ComponentPlacementInfo>())
+                .Where(info =>
+                    string.Equals(info.Step, step.Name, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(info.Layer, layer.Name, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (placements.Count == 0)
             {
-                lbl_Statistic.Text = layer.Components == null
-                    ? "Component data unavailable for this layer."
-                    : "No component placements were parsed for this layer.";
+                lbl_Statistic.Text = $"{stepText} • Unit: {unitText} • Components count: 0";
                 lbl_Status.Text = $"Layer '{layer.Name}' contains no components.";
                 return;
             }
 
-            foreach (var record in records)
+            foreach (var placement in placements)
             {
                 dgv_Data.Rows.Add(
-                    record.ComponentName,
-                    record.PartName,
-                    record.PkgRef,
-                    record.X,
-                    record.Y,
-                    record.Rot,
-                    record.Mirror);
+                    placement.ComponentName,
+                    placement.PackageName,
+                    placement.CenterX,
+                    placement.CenterY,
+                    placement.Rotation,
+                    placement.Width,
+                    placement.Length);
             }
 
-            var unitDisplay = string.IsNullOrWhiteSpace(layer.Components.Unit) ? "unknown unit" : layer.Components.Unit;
-            lbl_Statistic.Text = $"{records.Count} components • Unit: {unitDisplay}";
-            lbl_Status.Text = $"Layer '{layer.Name}' contains {records.Count} components.";
+            lbl_Statistic.Text = $"{stepText} • Unit: {unitText} • Components count: {placements.Count}";
+            lbl_Status.Text = $"Layer '{layer.Name}' (top-left) contains {placements.Count} components.";
         }
 
         private void ShowError(string message)
@@ -379,6 +390,7 @@ namespace ODB___Extractor
         private void ResetUi(string statusMessage = DefaultStatusText)
         {
             _currentJobReport = null;
+            _topLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
             ClearVisuals();
             lbl_Status.Text = statusMessage;
         }
@@ -414,9 +426,42 @@ namespace ODB___Extractor
             btn_ExportAllLayer.Enabled = enabled;
         }
 
+        private static string BuildStepDimensionText(ODBppExtractor.StepReport step)
+        {
+            if (step == null)
+            {
+                return "Dimension unavailable";
+            }
+
+            if (step.ProfileBoundingBox.HasValue)
+            {
+                var bbox = step.ProfileBoundingBox.Value;
+                var width = FormatDimension(bbox.MaxX - bbox.MinX);
+                var length = FormatDimension(bbox.MaxY - bbox.MinY);
+                return $"Dimension: {width} x {length}";
+            }
+
+            return "Dimension unavailable";
+        }
+
+        private static string DetermineLayerUnit(ODBppExtractor.StepReport step, ODBppExtractor.LayerReport layer)
+        {
+            var unit = layer?.Components?.Unit;
+            if (string.IsNullOrWhiteSpace(unit))
+            {
+                unit = step?.Unit;
+            }
+
+            return string.IsNullOrWhiteSpace(unit) ? "unit unknown" : unit;
+        }
+
+        private static string FormatDimension(double value) =>
+            value.ToString("0.######", CultureInfo.InvariantCulture);
+
         private void ClearVisuals()
         {
             _suspendSelection = true;
+            _topLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
             cbo_Step.DataSource = null;
             cbo_Layer.DataSource = null;
             cbo_Step.Enabled = false;

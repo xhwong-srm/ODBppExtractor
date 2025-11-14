@@ -45,6 +45,8 @@ namespace ODB___Extractor
             this.dgv_Data = new System.Windows.Forms.DataGridView();
             this.lbl_Statistic = new SRMControl.SRMLabel();
             this.gb_Data = new SRMControl.SRMGroupBox();
+            this.cbo_Origin = new SRMControl.SRMComboBox();
+            this.lbl_Origin = new SRMControl.SRMLabel();
             this.btn_RefreshData = new SRMControl.SRMButton();
             this.gb_Export = new SRMControl.SRMGroupBox();
             this.lbl_Status = new SRMControl.SRMLabel();
@@ -179,6 +181,8 @@ namespace ODB___Extractor
             // gb_Data
             // 
             this.gb_Data.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(150)))), ((int)(((byte)(185)))));
+            this.gb_Data.Controls.Add(this.cbo_Origin);
+            this.gb_Data.Controls.Add(this.lbl_Origin);
             this.gb_Data.Controls.Add(this.btn_RefreshData);
             this.gb_Data.Controls.Add(this.lbl_Statistic);
             this.gb_Data.Controls.Add(this.dgv_Data);
@@ -189,6 +193,22 @@ namespace ODB___Extractor
             resources.ApplyResources(this.gb_Data, "gb_Data");
             this.gb_Data.Name = "gb_Data";
             this.gb_Data.TabStop = false;
+            // 
+            // cbo_Origin
+            // 
+            this.cbo_Origin.BackColor = System.Drawing.Color.White;
+            this.cbo_Origin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbo_Origin.FocusBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.cbo_Origin.FormattingEnabled = true;
+            resources.ApplyResources(this.cbo_Origin, "cbo_Origin");
+            this.cbo_Origin.Name = "cbo_Origin";
+            this.cbo_Origin.NormalBackColor = System.Drawing.Color.White;
+            // 
+            // lbl_Origin
+            // 
+            resources.ApplyResources(this.lbl_Origin, "lbl_Origin");
+            this.lbl_Origin.Name = "lbl_Origin";
+            this.lbl_Origin.TextShadowColor = System.Drawing.Color.Gray;
             // 
             // btn_RefreshData
             // 
@@ -229,7 +249,6 @@ namespace ODB___Extractor
             // 
             // ExtractorForm
             // 
-            this.AllowDrop = true;
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(210)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
@@ -270,5 +289,7 @@ namespace ODB___Extractor
         private SRMControl.SRMButton btn_ExportLayer;
         private SRMControl.SRMButton btn_ExportAllLayer;
         private SRMControl.SRMButton btn_RefreshData;
+        private SRMControl.SRMComboBox cbo_Origin;
+        private SRMControl.SRMLabel lbl_Origin;
     }
 }
