@@ -1534,6 +1534,22 @@ namespace ODB___Extractor
             return filePath;
         }
 
+        public static IReadOnlyList<string> ExportComponentPlacementReports(
+            JobReport report,
+            CoordinateOrigin origin,
+            bool separateByLayer,
+            HashSet<string> layerFilter,
+            string targetDirectory)
+        {
+            if (report == null || string.IsNullOrWhiteSpace(targetDirectory))
+            {
+                return Array.Empty<string>();
+            }
+
+            Directory.CreateDirectory(targetDirectory);
+            return SaveComponentPlacementReport(report, origin, separateByLayer, layerFilter, targetDirectory);
+        }
+
         private static string FormatOrigin(CoordinateOrigin origin) =>
             origin == CoordinateOrigin.TopLeft ? "top-left" : "bottom-left";
 
@@ -1794,7 +1810,7 @@ namespace ODB___Extractor
             return new ComponentPlacementResult(componentUnit, componentElement);
         }
 
-        private enum CoordinateOrigin
+        public enum CoordinateOrigin
         {
             BottomLeft,
             TopLeft

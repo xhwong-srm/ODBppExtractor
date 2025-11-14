@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WK.Libraries.BetterFolderBrowserNS;
 
 namespace ODB___Extractor
 {
@@ -155,15 +156,9 @@ namespace ODB___Extractor
             HandleLayerSelectionChange();
         }
 
-        private void btn_ExportAllLayer_Click(object sender, EventArgs e)
-        {
+        private void btn_ExportAllLayer_Click(object sender, EventArgs e) => ExportComponents(true);
 
-        }
-
-        private void btn_ExportLayer_Click(object sender, EventArgs e)
-        {
-
-        }
+        private void btn_ExportLayer_Click(object sender, EventArgs e) => ExportComponents(false);
 
         private async void txt_Path_TextChanged(object sender, EventArgs e)
         {
@@ -439,6 +434,93 @@ namespace ODB___Extractor
             btn_ExportLayer.Enabled = enabled;
             btn_ExportAllLayer.Enabled = enabled;
             cbo_Origin.Enabled = enabled;
+        }
+
+        private void ExportComponents(bool exportAllLayers)
+        {
+            if (_currentJobReport == null)
+            {
+                ShowError("Load an ODB++ job before exporting.");
+                return;
+            }
+
+            if (!TrySelectExportDirectory(out var targetDirectory))
+            {
+                return;
+            }
+
+            HashSet<string> layerFilter = null;
+            if (!exportAllLayers)
+            {
+                var layerReport = cbo_Layer.SelectedItem as ODBppExtractor.LayerReport;
+                if (layerReport == null)
+                {
+                    ShowError("Select a layer before exporting.");
+                    return;
+                }
+
+                var layerName = layerReport.Name;
+                if (string.IsNullOrWhiteSpace(layerName))
+                {
+                    ShowError("Selected layer does not have a valid name.");
+                    return;
+                }
+
+                layerFilter = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { layerName };
+            }
+
+            var origin = IsOriginBottomLeftSelected()
+                ? ODBppExtractor.CoordinateOrigin.BottomLeft
+                : ODBppExtractor.CoordinateOrigin.TopLeft;
+
+            IReadOnlyList<string> exportedPaths;
+            try
+            {
+                exportedPaths = ODBppExtractor.ExportComponentPlacementReports(
+                    _currentJobReport,
+                    origin,
+                    separateByLayer: true,
+                    layerFilter,
+                    targetDirectory);
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Export failed: {ex.Message}");
+                return;
+            }
+
+            if (exportedPaths == null || exportedPaths.Count == 0)
+            {
+                MessageBox.Show(this, "No component reports were generated.", "Export result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            MessageBox.Show(this, $"Component reports exported to:\n{targetDirectory}", "Export complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private bool TrySelectExportDirectory(out string exportDirectory)
+        {
+            exportDirectory = null;
+            using (var browser = new BetterFolderBrowser
+            {
+                Title = "Select export folder",
+                Multiselect = false
+            })
+            {
+                if (browser.ShowDialog(this) != DialogResult.OK)
+                {
+                    return false;
+                }
+
+                var selected = browser.SelectedPath;
+                if (string.IsNullOrWhiteSpace(selected))
+                {
+                    return false;
+                }
+
+                exportDirectory = selected;
+                return true;
+            }
         }
 
         private static string BuildStepDimensionText(ODBppExtractor.StepReport step)
