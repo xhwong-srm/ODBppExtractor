@@ -1446,7 +1446,7 @@ namespace ODB___Extractor
             return filePath;
         }
 
-        private static IReadOnlyList<string> SaveComponentPlacementReport(JobReport report, CoordinateOrigin origin, bool separateByLayer, HashSet<string> layerFilter, string reportsDir)
+        private static IReadOnlyList<string> SaveComponentPlacementReport(JobReport report, CoordinateOrigin origin, bool separateByLayer, HashSet<string> layerFilter, string reportsDir, string targetUnit = null)
         {
             if (!separateByLayer)
             {
@@ -1457,6 +1457,7 @@ namespace ODB___Extractor
                     return Array.Empty<string>();
                 }
 
+                ConvertStepElementsToTargetUnit(layerElements, targetUnit);
                 var filePath = SaveComponentPlacementDocument(report, origin, "_components", layerElements, reportsDir);
                 return new[] { filePath };
             }
@@ -1495,6 +1496,7 @@ namespace ODB___Extractor
                     continue;
                 }
 
+                ConvertStepElementsToTargetUnit(layerElements, targetUnit);
                 var filePath = SaveComponentPlacementDocument(report, origin, uniqueSuffix, layerElements, reportsDir, layerName);
                 filePaths.Add(filePath);
             }
@@ -1534,12 +1536,73 @@ namespace ODB___Extractor
             return filePath;
         }
 
+        private static void ConvertStepElementsToTargetUnit(IReadOnlyList<XElement> stepElements, string targetUnit)
+        {
+            if (stepElements == null || string.IsNullOrWhiteSpace(targetUnit))
+            {
+                return;
+            }
+
+            var normalizedTarget = NormalizeUnit(targetUnit);
+            if (string.IsNullOrEmpty(normalizedTarget))
+            {
+                return;
+            }
+
+            foreach (var step in stepElements)
+            {
+                foreach (var layer in step.Elements("layer"))
+                {
+                    var unitAttribute = layer.Attribute("unit");
+                    var sourceUnit = NormalizeUnit(unitAttribute?.Value);
+                    if (string.IsNullOrEmpty(sourceUnit))
+                    {
+                        continue;
+                    }
+
+                    if (sourceUnit == normalizedTarget)
+                    {
+                        unitAttribute?.SetValue(normalizedTarget);
+                        continue;
+                    }
+
+                    foreach (var component in layer.Elements("component"))
+                    {
+                        ConvertComponentAttribute(component, "centerX", sourceUnit, normalizedTarget);
+                        ConvertComponentAttribute(component, "centerY", sourceUnit, normalizedTarget);
+                        ConvertComponentAttribute(component, "width", sourceUnit, normalizedTarget);
+                        ConvertComponentAttribute(component, "length", sourceUnit, normalizedTarget);
+                    }
+
+                    unitAttribute?.SetValue(normalizedTarget);
+                }
+            }
+        }
+
+        private static void ConvertComponentAttribute(XElement component, string attributeName, string fromUnit, string toUnit)
+        {
+            var attribute = component.Attribute(attributeName);
+            if (attribute == null)
+            {
+                return;
+            }
+
+            if (!double.TryParse(attribute.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+            {
+                return;
+            }
+
+            var converted = ConvertUnits(value, fromUnit, toUnit);
+            attribute.Value = FormatDouble(converted);
+        }
+
         public static IReadOnlyList<string> ExportComponentPlacementReports(
             JobReport report,
             CoordinateOrigin origin,
             bool separateByLayer,
             HashSet<string> layerFilter,
-            string targetDirectory)
+            string targetDirectory,
+            string targetUnit = null)
         {
             if (report == null || string.IsNullOrWhiteSpace(targetDirectory))
             {
@@ -1547,7 +1610,7 @@ namespace ODB___Extractor
             }
 
             Directory.CreateDirectory(targetDirectory);
-            return SaveComponentPlacementReport(report, origin, separateByLayer, layerFilter, targetDirectory);
+            return SaveComponentPlacementReport(report, origin, separateByLayer, layerFilter, targetDirectory, targetUnit);
         }
 
         private static string FormatOrigin(CoordinateOrigin origin) =>
