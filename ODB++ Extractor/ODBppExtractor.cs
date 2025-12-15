@@ -1446,11 +1446,11 @@ namespace ODB___Extractor
             return filePath;
         }
 
-        private static IReadOnlyList<string> SaveComponentPlacementReport(JobReport report, CoordinateOrigin origin, bool separateByLayer, HashSet<string> layerFilter, string reportsDir, string targetUnit = null)
+        private static IReadOnlyList<string> SaveComponentPlacementReport(JobReport report, CoordinateOrigin origin, bool separateByLayer, HashSet<string> layerFilter, string reportsDir, string targetUnit = null, bool mirrorBottomLayerX = false)
         {
             if (!separateByLayer)
             {
-                var layerElements = BuildComponentPlacementLayerElements(report, origin, layerFilter);
+                var layerElements = BuildComponentPlacementLayerElements(report, origin, layerFilter, mirrorBottomLayerX);
                 if (layerElements.Count == 0)
                 {
                     LogInfo($"Component placement report ({FormatOrigin(origin)}) skipped (no components with package data).");
@@ -1462,7 +1462,7 @@ namespace ODB___Extractor
                 return new[] { filePath };
             }
 
-            var entries = BuildComponentPlacementEntries(report, origin, layerFilter);
+            var entries = BuildComponentPlacementEntries(report, origin, layerFilter, mirrorBottomLayerX);
             if (entries.Count == 0)
             {
                 LogInfo($"Component placement report ({FormatOrigin(origin)}) skipped (no components with package data).");
@@ -1602,7 +1602,8 @@ namespace ODB___Extractor
             bool separateByLayer,
             HashSet<string> layerFilter,
             string targetDirectory,
-            string targetUnit = null)
+            string targetUnit = null,
+            bool mirrorBottomLayerX = false)
         {
             if (report == null || string.IsNullOrWhiteSpace(targetDirectory))
             {
@@ -1610,19 +1611,19 @@ namespace ODB___Extractor
             }
 
             Directory.CreateDirectory(targetDirectory);
-            return SaveComponentPlacementReport(report, origin, separateByLayer, layerFilter, targetDirectory, targetUnit);
+            return SaveComponentPlacementReport(report, origin, separateByLayer, layerFilter, targetDirectory, targetUnit, mirrorBottomLayerX);
         }
 
         private static string FormatOrigin(CoordinateOrigin origin) =>
             origin == CoordinateOrigin.TopLeft ? "top-left" : "bottom-left";
 
-        private static List<XElement> BuildComponentPlacementLayerElements(JobReport report, CoordinateOrigin origin, HashSet<string> layerFilter)
+        private static List<XElement> BuildComponentPlacementLayerElements(JobReport report, CoordinateOrigin origin, HashSet<string> layerFilter, bool mirrorBottomLayerX)
         {
-            var entries = BuildComponentPlacementEntries(report, origin, layerFilter);
+            var entries = BuildComponentPlacementEntries(report, origin, layerFilter, mirrorBottomLayerX);
             return BuildStepElementsFromEntries(entries);
         }
 
-        private static List<LayerComponentEntry> BuildComponentPlacementEntries(JobReport report, CoordinateOrigin origin, HashSet<string> layerFilter)
+        private static List<LayerComponentEntry> BuildComponentPlacementEntries(JobReport report, CoordinateOrigin origin, HashSet<string> layerFilter, bool mirrorBottomLayerX)
         {
             var entries = new List<LayerComponentEntry>();
             foreach (var step in report.Steps)
@@ -1662,7 +1663,7 @@ namespace ODB___Extractor
 
                     foreach (var component in componentData.Records)
                     {
-                        var result = BuildComponentPlacementElement(step, layer, component, eda, packageByIndex, origin);
+                        var result = BuildComponentPlacementElement(step, layer, component, eda, packageByIndex, origin, mirrorBottomLayerX);
                         if (result != null)
                         {
                             entries.Add(new LayerComponentEntry(
@@ -1736,7 +1737,7 @@ namespace ODB___Extractor
             }
 
             var origin = topLeft ? CoordinateOrigin.TopLeft : CoordinateOrigin.BottomLeft;
-            var entries = BuildComponentPlacementEntries(report, origin, null);
+            var entries = BuildComponentPlacementEntries(report, origin, null, mirrorBottomLayerX: false);
             var placements = new List<ComponentPlacementInfo>(entries.Count);
             foreach (var entry in entries)
             {
@@ -1793,7 +1794,8 @@ namespace ODB___Extractor
             ComponentRecord component,
             EdaData eda,
             IReadOnlyDictionary<int, PkgRecord> packageByIndex,
-            CoordinateOrigin origin)
+            CoordinateOrigin origin,
+            bool mirrorBottomLayerX)
         {
             if (!TryResolvePackage(component.PkgRef, packageByIndex, out var pkg))
             {
@@ -1828,7 +1830,7 @@ namespace ODB___Extractor
             var componentY = ParseDouble(component.Y);
             var centerX = componentX + offset.x;
             var centerY = componentY + offset.y;
-            if (isBottomLayer)
+            if (isBottomLayer && mirrorBottomLayerX)
             {
                 if (TryGetStepHorizontalBounds(step, componentUnit, out var stepMinX, out var stepMaxX))
                 {
