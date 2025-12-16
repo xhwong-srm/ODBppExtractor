@@ -1820,8 +1820,10 @@ namespace ODB___Extractor
 
             var rotationDegrees = ParseDouble(component.Rot);
             var quarterTurns = NormalizeQuarterTurns(rotationDegrees);
-            var offset = RotateClockwise((bounds.CenterX, bounds.CenterY), quarterTurns);
-            if (IsMirrored(component.Mirror))
+            var localOffset = (x: bounds.CenterX, y: bounds.CenterY);
+            var offset = RotateClockwise(localOffset, quarterTurns);
+            var mirrorOffsetX = IsMirrored(component.Mirror) ^ isBottomLayer;
+            if (mirrorOffsetX)
             {
                 offset = (-offset.x, offset.y);
             }
@@ -1834,15 +1836,19 @@ namespace ODB___Extractor
             {
                 if (TryGetStepHorizontalBounds(step, componentUnit, out var stepMinX, out var stepMaxX))
                 {
-                    // Mirror the component across the PCB width using the rotated offset.
-                    var mirroredComponentX = (stepMinX + stepMaxX) - componentX;
-                    centerX = mirroredComponentX + offset.x;
+                    centerX = (stepMinX + stepMaxX) - centerX;
                 }
                 else
                 {
                     LogInfo(
                         $"     Warning: Unable to mirror component '{component.ComponentName}' on layer '{layer.Name}' because PCB width is unavailable.");
                 }
+            }
+
+            if (isBottomLayer || mirrorOffsetX || mirrorBottomLayerX)
+            {
+                LogInfo(
+                    $"       placement: name={component.ComponentName}, layer={layer.Name}, bottom={isBottomLayer}, mirrorFlag={component.Mirror}, mirrorOffsetX={(mirrorOffsetX ? "Y" : "N")}, rot={rotationDegrees}, offset=({FormatDouble(offset.x)},{FormatDouble(offset.y)}), center=({FormatDouble(centerX)},{FormatDouble(centerY)}), mirrorBottomX={(mirrorBottomLayerX ? "Y" : "N")}");
             }
 
             if (TryGetStepOriginOffset(step, componentUnit, out var originOffsetX, out var originOffsetY)
