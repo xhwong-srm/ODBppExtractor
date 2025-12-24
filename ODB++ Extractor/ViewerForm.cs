@@ -208,7 +208,10 @@ namespace ODB___Extractor
             var sidebarWidth = (sidebarPanel.Visible && sidebarPanel.Dock == DockStyle.Right) ? sidebarPanel.Width : 0;
             var visibleWidth = Math.Max(1f, clientSize.Width - sidebarWidth);
             offsetX = visibleWidth / 2f - (float)(component.CenterX * scale);
-            offsetY = clientSize.Height / 2f - (float)(component.CenterY * scale);
+            var compY = string.Equals(boardData?.Origin, "bottom-left", StringComparison.OrdinalIgnoreCase)
+                ? (boardData?.Length ?? 0) - component.CenterY
+                : component.CenterY;
+            offsetY = clientSize.Height / 2f - (float)(compY * scale);
         }
 
         private void Canvas_Paint(object sender, PaintEventArgs e)
@@ -240,7 +243,9 @@ namespace ODB___Extractor
         private void DrawBoard(Graphics g)
         {
             var x = WorldToScreenX(0);
-            var y = WorldToScreenY(0);
+            var y = string.Equals(boardData?.Origin, "bottom-left", StringComparison.OrdinalIgnoreCase)
+                ? WorldToScreenY(boardData.Length)
+                : WorldToScreenY(0);
             var w = (float)(boardData.Width * scale);
             var h = (float)(boardData.Length * scale);
 
@@ -304,7 +309,12 @@ namespace ODB___Extractor
         }
 
         private float WorldToScreenX(double x) => (float)(x * scale + offsetX);
-        private float WorldToScreenY(double y) => (float)(y * scale + offsetY);
+        private float WorldToScreenY(double y)
+        {
+            var originBottomLeft = string.Equals(boardData?.Origin, "bottom-left", StringComparison.OrdinalIgnoreCase);
+            var worldY = originBottomLeft ? (boardData?.Length ?? 0) - y : y;
+            return (float)(worldY * scale + offsetY);
+        }
         private double ScreenToWorldX(float x) => (x - offsetX) / scale;
         private double ScreenToWorldY(float y) => (y - offsetY) / scale;
 
