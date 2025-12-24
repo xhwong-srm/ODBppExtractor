@@ -9,6 +9,8 @@ using System.Xml.Linq;
 using System.Xml;
 using JobReport = ODB___Extractor.ODBppExtractor.JobReport;
 using CoordinateOrigin = ODB___Extractor.ODBppExtractor.CoordinateOrigin;
+using AxisFlip = ODB___Extractor.ODBppExtractor.AxisFlip;
+using ComponentPlacementFlipOptions = ODB___Extractor.ODBppExtractor.ComponentPlacementFlipOptions;
 
 namespace ODBppExtractor.Tests
 {
@@ -47,6 +49,13 @@ namespace ODBppExtractor.Tests
         {
             var outputDirectory = Path.Combine(tempRoot, $"{scenarioName}-export");
             Directory.CreateDirectory(outputDirectory);
+            var flipOptions = mirrorBottomLayerX
+                ? new ComponentPlacementFlipOptions
+                {
+                    Axes = AxisFlip.X,
+                    BottomLayerOnly = true
+                }
+                : null;
             var exportedPaths = ODB___Extractor.ODBppExtractor.ExportComponentPlacementReports(
                 jobReport,
                 CoordinateOrigin.TopLeft,
@@ -54,7 +63,7 @@ namespace ODBppExtractor.Tests
                 layerFilter: null,
                 targetDirectory: outputDirectory,
                 targetUnit: "MM",
-                mirrorBottomLayerX: mirrorBottomLayerX);
+                flipOptions: flipOptions);
 
             Assert.IsTrue(exportedPaths.Count > 0, $"No placement reports were generated for {scenarioName}.");
 

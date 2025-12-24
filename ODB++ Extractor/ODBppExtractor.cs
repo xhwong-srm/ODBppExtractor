@@ -252,6 +252,24 @@ namespace ODB___Extractor
             public double MaxX { get; }
             public double MaxY { get; }
         }
+        [Flags]
+        public enum AxisFlip
+        {
+            None = 0,
+            X = 1,
+            Y = 2
+        }
+
+        public sealed class ComponentPlacementFlipOptions
+        {
+            public AxisFlip Axes { get; set; }
+            public bool BottomLayerOnly { get; set; }
+
+            public bool ShouldFlipLayer(bool isBottomLayer) =>
+                Axes != AxisFlip.None && (!BottomLayerOnly || isBottomLayer);
+
+            public bool ShouldFlipAxis(AxisFlip axis) => (Axes & axis) == axis;
+        }
         /// <summary>
         /// Top-level artifact returned to callers so they can inspect steps, layers, and generated paths.
         /// </summary>
@@ -437,14 +455,14 @@ namespace ODB___Extractor
                 switch (exportPreferences.ComponentMode)
                 {
                     case ComponentExportMode.BottomLeft:
-                        componentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.BottomLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir));
+                        componentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.BottomLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir, flipOptions: exportPreferences.ComponentPlacementFlipOptions));
                         break;
                     case ComponentExportMode.TopLeft:
-                        topLeftComponentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.TopLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir));
+                        topLeftComponentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.TopLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir, flipOptions: exportPreferences.ComponentPlacementFlipOptions));
                         break;
                     case ComponentExportMode.Both:
-                        componentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.BottomLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir));
-                        topLeftComponentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.TopLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir));
+                        componentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.BottomLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir, flipOptions: exportPreferences.ComponentPlacementFlipOptions));
+                        topLeftComponentReportPaths.AddRange(SaveComponentPlacementReport(jobReport, CoordinateOrigin.TopLeft, exportPreferences.SeparateComponentFilesByLayer, layerFilter, reportsDir, flipOptions: exportPreferences.ComponentPlacementFlipOptions));
                         break;
                     case ComponentExportMode.None:
                         break;
@@ -1446,11 +1464,11 @@ namespace ODB___Extractor
             return filePath;
         }
 
-        private static IReadOnlyList<string> SaveComponentPlacementReport(JobReport report, CoordinateOrigin origin, bool separateByLayer, HashSet<string> layerFilter, string reportsDir, string targetUnit = null, bool mirrorBottomLayerX = false)
+        private static IReadOnlyList<string> SaveComponentPlacementReport(JobReport report, CoordinateOrigin origin, bool separateByLayer, HashSet<string> layerFilter, string reportsDir, string targetUnit = null, ComponentPlacementFlipOptions flipOptions = null)
         {
             if (!separateByLayer)
             {
-                var layerElements = BuildComponentPlacementLayerElements(report, origin, layerFilter, mirrorBottomLayerX);
+                var layerElements = BuildComponentPlacementLayerElements(report, origin, layerFilter, flipOptions);
                 if (layerElements.Count == 0)
                 {
                     LogInfo($"Component placement report ({FormatOrigin(origin)}) skipped (no components with package data).");
@@ -1462,7 +1480,7 @@ namespace ODB___Extractor
                 return new[] { filePath };
             }
 
-            var entries = BuildComponentPlacementEntries(report, origin, layerFilter, mirrorBottomLayerX);
+            var entries = BuildComponentPlacementEntries(report, origin, layerFilter, flipOptions);
             if (entries.Count == 0)
             {
                 LogInfo($"Component placement report ({FormatOrigin(origin)}) skipped (no components with package data).");
@@ -1603,7 +1621,8 @@ namespace ODB___Extractor
             HashSet<string> layerFilter,
             string targetDirectory,
             string targetUnit = null,
-            bool mirrorBottomLayerX = false)
+            bool mirrorBottomLayerX = false,
+            ComponentPlacementFlipOptions flipOptions = null)
         {
             if (report == null || string.IsNullOrWhiteSpace(targetDirectory))
             {
@@ -1611,19 +1630,39 @@ namespace ODB___Extractor
             }
 
             Directory.CreateDirectory(targetDirectory);
-            return SaveComponentPlacementReport(report, origin, separateByLayer, layerFilter, targetDirectory, targetUnit, mirrorBottomLayerX);
+            var resolvedFlipOptions = ResolveComponentPlacementFlipOptions(mirrorBottomLayerX, flipOptions);
+            return SaveComponentPlacementReport(report, origin, separateByLayer, layerFilter, targetDirectory, targetUnit, resolvedFlipOptions);
+        }
+
+        private static ComponentPlacementFlipOptions ResolveComponentPlacementFlipOptions(bool mirrorBottomLayerX, ComponentPlacementFlipOptions flipOptions)
+        {
+            if (flipOptions != null)
+            {
+                return flipOptions;
+            }
+
+            if (mirrorBottomLayerX)
+            {
+                return new ComponentPlacementFlipOptions
+                {
+                    Axes = AxisFlip.X,
+                    BottomLayerOnly = true
+                };
+            }
+
+            return null;
         }
 
         private static string FormatOrigin(CoordinateOrigin origin) =>
             origin == CoordinateOrigin.TopLeft ? "top-left" : "bottom-left";
 
-        private static List<XElement> BuildComponentPlacementLayerElements(JobReport report, CoordinateOrigin origin, HashSet<string> layerFilter, bool mirrorBottomLayerX)
+        private static List<XElement> BuildComponentPlacementLayerElements(JobReport report, CoordinateOrigin origin, HashSet<string> layerFilter, ComponentPlacementFlipOptions flipOptions = null)
         {
-            var entries = BuildComponentPlacementEntries(report, origin, layerFilter, mirrorBottomLayerX);
+            var entries = BuildComponentPlacementEntries(report, origin, layerFilter, flipOptions);
             return BuildStepElementsFromEntries(entries);
         }
 
-        private static List<LayerComponentEntry> BuildComponentPlacementEntries(JobReport report, CoordinateOrigin origin, HashSet<string> layerFilter, bool mirrorBottomLayerX)
+        private static List<LayerComponentEntry> BuildComponentPlacementEntries(JobReport report, CoordinateOrigin origin, HashSet<string> layerFilter, ComponentPlacementFlipOptions flipOptions = null)
         {
             var entries = new List<LayerComponentEntry>();
             foreach (var step in report.Steps)
@@ -1663,7 +1702,7 @@ namespace ODB___Extractor
 
                     foreach (var component in componentData.Records)
                     {
-                        var result = BuildComponentPlacementElement(step, layer, component, eda, packageByIndex, origin, mirrorBottomLayerX);
+                        var result = BuildComponentPlacementElement(step, layer, component, eda, packageByIndex, origin, flipOptions);
                         if (result != null)
                         {
                             entries.Add(new LayerComponentEntry(
@@ -1737,7 +1776,7 @@ namespace ODB___Extractor
             }
 
             var origin = topLeft ? CoordinateOrigin.TopLeft : CoordinateOrigin.BottomLeft;
-            var entries = BuildComponentPlacementEntries(report, origin, null, mirrorBottomLayerX: false);
+            var entries = BuildComponentPlacementEntries(report, origin, null);
             var placements = new List<ComponentPlacementInfo>(entries.Count);
             foreach (var entry in entries)
             {
@@ -1795,7 +1834,7 @@ namespace ODB___Extractor
             EdaData eda,
             IReadOnlyDictionary<int, PkgRecord> packageByIndex,
             CoordinateOrigin origin,
-            bool mirrorBottomLayerX)
+            ComponentPlacementFlipOptions flipOptions)
         {
             if (!TryResolvePackage(component.PkgRef, packageByIndex, out var pkg))
             {
@@ -1832,23 +1871,43 @@ namespace ODB___Extractor
             var componentY = ParseDouble(component.Y);
             var centerX = componentX + offset.x;
             var centerY = componentY + offset.y;
-            if (isBottomLayer && mirrorBottomLayerX)
+            var appliedFlipAxes = AxisFlip.None;
+            if (flipOptions?.ShouldFlipLayer(isBottomLayer) == true)
             {
-                if (TryGetStepHorizontalBounds(step, componentUnit, out var stepMinX, out var stepMaxX))
+                if (flipOptions.ShouldFlipAxis(AxisFlip.X))
                 {
-                    centerX = (stepMinX + stepMaxX) - centerX;
+                    if (TryGetStepHorizontalBounds(step, componentUnit, out var stepMinX, out var stepMaxX))
+                    {
+                        centerX = (stepMinX + stepMaxX) - centerX;
+                        appliedFlipAxes |= AxisFlip.X;
+                    }
+                    else
+                    {
+                        LogInfo(
+                            $"     Warning: Unable to flip component '{component.ComponentName}' on layer '{layer.Name}' around the X axis because PCB width is unavailable.");
+                    }
                 }
-                else
+
+                if (flipOptions.ShouldFlipAxis(AxisFlip.Y))
                 {
-                    LogInfo(
-                        $"     Warning: Unable to mirror component '{component.ComponentName}' on layer '{layer.Name}' because PCB width is unavailable.");
+                    if (TryGetStepVerticalBounds(step, componentUnit, out var stepMinY, out var stepMaxY))
+                    {
+                        centerY = (stepMinY + stepMaxY) - centerY;
+                        appliedFlipAxes |= AxisFlip.Y;
+                    }
+                    else
+                    {
+                        LogInfo(
+                            $"     Warning: Unable to flip component '{component.ComponentName}' on layer '{layer.Name}' around the Y axis because PCB height is unavailable.");
+                    }
                 }
             }
 
-            if (isBottomLayer || mirrorOffsetX || mirrorBottomLayerX)
+            if (isBottomLayer || mirrorOffsetX || appliedFlipAxes != AxisFlip.None)
             {
+                var flipAxesLabel = appliedFlipAxes == AxisFlip.None ? "N" : appliedFlipAxes.ToString();
                 LogInfo(
-                    $"       placement: name={component.ComponentName}, layer={layer.Name}, bottom={isBottomLayer}, mirrorFlag={component.Mirror}, mirrorOffsetX={(mirrorOffsetX ? "Y" : "N")}, rot={rotationDegrees}, offset=({FormatDouble(offset.x)},{FormatDouble(offset.y)}), center=({FormatDouble(centerX)},{FormatDouble(centerY)}), mirrorBottomX={(mirrorBottomLayerX ? "Y" : "N")}");
+                    $"       placement: name={component.ComponentName}, layer={layer.Name}, bottom={isBottomLayer}, mirrorFlag={component.Mirror}, mirrorOffsetX={(mirrorOffsetX ? "Y" : "N")}, rot={rotationDegrees}, offset=({FormatDouble(offset.x)},{FormatDouble(offset.y)}), center=({FormatDouble(centerX)},{FormatDouble(centerY)}), flipAxes={flipAxesLabel}");
             }
 
             if (TryGetStepOriginOffset(step, componentUnit, out var originOffsetX, out var originOffsetY)
@@ -2455,6 +2514,34 @@ namespace ODB___Extractor
             return true;
         }
 
+        private static bool TryGetStepVerticalBounds(StepReport step, string targetUnit, out double minY, out double maxY)
+        {
+            minY = 0;
+            maxY = 0;
+
+            if (step?.ProfileBoundingBox == null)
+            {
+                return false;
+            }
+
+            var bbox = step.ProfileBoundingBox.Value;
+            var convertedMinY = ConvertUnits(bbox.MinY, step.Unit, targetUnit);
+            var convertedMaxY = ConvertUnits(bbox.MaxY, step.Unit, targetUnit);
+
+            if (convertedMinY <= convertedMaxY)
+            {
+                minY = convertedMinY;
+                maxY = convertedMaxY;
+            }
+            else
+            {
+                minY = convertedMaxY;
+                maxY = convertedMinY;
+            }
+
+            return true;
+        }
+
         private static bool TryGetStepHeight(StepReport step, string targetUnit, out double height)
         {
             height = 0;
@@ -2687,6 +2774,7 @@ namespace ODB___Extractor
                 ExportJobReport = true;
                 ComponentMode = ComponentExportMode.Both;
                 SeparateComponentFilesByLayer = false;
+                ComponentPlacementFlipOptions = null;
             }
 
             public bool ExportJobReport { get; set; }
@@ -2694,6 +2782,7 @@ namespace ODB___Extractor
             public bool SeparateComponentFilesByLayer { get; set; }
             public IReadOnlyList<string> ComponentLayerFilter { get; set; }
             public Func<JobReport, IReadOnlyList<string>> LayerSelectionProvider { get; set; }
+            public ComponentPlacementFlipOptions ComponentPlacementFlipOptions { get; set; }
 
             public static ExportPreferences Default => new ExportPreferences();
         }
