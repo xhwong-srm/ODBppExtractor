@@ -24,6 +24,7 @@ namespace ODB___Extractor
         private bool _isLoading;
         private ODBppExtractor.JobReport _currentJobReport;
         private readonly string _workingDirectoryRoot;
+        private ViewerForm _viewerForm;
 
         public ExtractorForm()
         {
@@ -199,6 +200,8 @@ namespace ODB___Extractor
             lbl_Status.Text = $"Step '{step.Name}' selected ({step.Layers.Count} layer(s)).";
             lbl_Statistic.Text = BuildStepDimensionText(step);
             PopulateLayerCombo(step);
+
+            RefreshViewer(autoFit: true);
         }
 
         private void HandleLayerSelectionChange()
@@ -211,6 +214,8 @@ namespace ODB___Extractor
             var step = cbo_Step.SelectedItem as ODBppExtractor.StepReport;
             var layer = cbo_Layer.SelectedItem as ODBppExtractor.LayerReport;
             DisplayLayerComponents(step, layer);
+
+            RefreshViewer(autoFit: true);
         }
 
         private void InitializeDataGrid()
@@ -285,6 +290,8 @@ namespace ODB___Extractor
 
                 PopulateSteps();
                 lbl_Status.Text = $"Loaded {_currentJobReport.Steps.Count} step(s).";
+
+                RefreshViewer(autoFit: true);
             }
             catch (Exception ex)
             {
@@ -404,6 +411,7 @@ namespace ODB___Extractor
         private void ResetUi(string statusMessage = DefaultStatusText)
         {
             _currentJobReport = null;
+            CloseViewer();
             ClearVisuals();
             lbl_Status.Text = statusMessage;
         }
@@ -671,33 +679,84 @@ namespace ODB___Extractor
 
             try
             {
-                // Generate XML content for the viewer
-                var origin = IsOriginBottomLeftSelected()
-                    ? ODBppExtractor.CoordinateOrigin.BottomLeft
-                    : ODBppExtractor.CoordinateOrigin.TopLeft;
+                var xmlContent = BuildViewerXml();
 
-                var flipOptions = BuildComponentPlacementFlipOptions();
-                
-                // Get selected layer or all layers
-                HashSet<string> layerFilter = null;
-                var selectedLayer = cbo_Layer.SelectedItem as ODBppExtractor.LayerReport;
-                if (selectedLayer != null && selectedLayer.Exists)
+                if (_viewerForm == null || _viewerForm.IsDisposed)
                 {
-                    layerFilter = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { selectedLayer.Name };
+                    _viewerForm = new ViewerForm(xmlContent);
+                    _viewerForm.FormClosed += (s, e) => _viewerForm = null;
+                    _viewerForm.Show(this);
                 }
-
-                // Build XML for viewer
-                var xmlContent = GenerateViewerXml(_currentJobReport, origin, layerFilter, flipOptions);
-                
-                // Show viewer form
-                using (var viewerForm = new ViewerForm(xmlContent))
+                else
                 {
-                    viewerForm.ShowDialog(this);
+                    _viewerForm.UpdateFromXml(xmlContent, autoFit: true);
+                    _viewerForm.BringToFront();
+                    _viewerForm.Focus();
                 }
             }
             catch (Exception ex)
             {
                 ShowError($"Failed to open viewer: {ex.Message}");
+            }
+        }
+
+        private string BuildViewerXml()
+        {
+            var origin = IsOriginBottomLeftSelected()
+                ? ODBppExtractor.CoordinateOrigin.BottomLeft
+                : ODBppExtractor.CoordinateOrigin.TopLeft;
+
+            var flipOptions = BuildComponentPlacementFlipOptions();
+
+            HashSet<string> layerFilter = null;
+            var selectedLayer = cbo_Layer.SelectedItem as ODBppExtractor.LayerReport;
+            if (selectedLayer != null && selectedLayer.Exists)
+            {
+                layerFilter = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { selectedLayer.Name };
+            }
+
+            return GenerateViewerXml(_currentJobReport, origin, layerFilter, flipOptions);
+        }
+
+        private void RefreshViewer(bool autoFit)
+        {
+            if (_viewerForm == null || _viewerForm.IsDisposed || _currentJobReport == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var xmlContent = BuildViewerXml();
+                _viewerForm.UpdateFromXml(xmlContent, autoFit: autoFit);
+            }
+            catch
+            {
+                // Keep the main workflow responsive even if viewer refresh fails
+            }
+        }
+
+        private void CloseViewer()
+        {
+            if (_viewerForm == null)
+            {
+                return;
+            }
+
+            try
+            {
+                if (!_viewerForm.IsDisposed)
+                {
+                    _viewerForm.Close();
+                }
+            }
+            catch
+            {
+                // Ignore viewer closing errors
+            }
+            finally
+            {
+                _viewerForm = null;
             }
         }
 

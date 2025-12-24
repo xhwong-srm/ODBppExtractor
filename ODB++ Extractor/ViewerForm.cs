@@ -46,8 +46,8 @@ namespace ODB___Extractor
             EnableCanvasDoubleBuffering();
             this.Shown += ViewerForm_Shown;
             canvasPanel.SizeChanged += CanvasPanel_SizeChanged;
-            ParseXmlData();
-            SetupUI();
+
+            LoadFromXml(xmlContent, autoFit: true, clearSearch: true);
         }
         private void ParseXmlData()
         {
@@ -102,6 +102,37 @@ namespace ODB___Extractor
             {
                 MessageBox.Show($"Error parsing XML: {ex.Message}", "Parse Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void LoadFromXml(string xmlContent, bool autoFit, bool clearSearch)
+        {
+            _xmlContent = xmlContent ?? string.Empty;
+            selectedComponent = null;
+            hoveredComponent = null;
+
+            if (clearSearch)
+            {
+                txt_Search.TextChanged -= txt_Search_TextChanged;
+                txt_Search.Text = string.Empty;
+                txt_Search.TextChanged += txt_Search_TextChanged;
+            }
+
+            ParseXmlData();
+            SetupUI();
+
+            if (autoFit)
+            {
+                FitToView();
+            }
+            else
+            {
+                canvasPanel.Invalidate();
+            }
+        }
+
+        public void UpdateFromXml(string xmlContent, bool autoFit = true, bool clearSearch = true)
+        {
+            LoadFromXml(xmlContent, autoFit, clearSearch);
         }
 
         private void SetupUI()
