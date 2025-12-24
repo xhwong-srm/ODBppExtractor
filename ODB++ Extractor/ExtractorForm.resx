@@ -549,6 +549,30 @@
   <data name="&gt;&gt;gb_Data.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="btn_PreviewData.Location" type="System.Drawing.Point, System.Drawing">
+    <value>357, 21</value>
+  </data>
+  <data name="btn_PreviewData.Size" type="System.Drawing.Size, System.Drawing">
+    <value>83, 38</value>
+  </data>
+  <data name="btn_PreviewData.TabIndex" type="System.Int32, mscorlib">
+    <value>16</value>
+  </data>
+  <data name="btn_PreviewData.Text" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="&gt;&gt;btn_PreviewData.Name" xml:space="preserve">
+    <value>btn_PreviewData</value>
+  </data>
+  <data name="&gt;&gt;btn_PreviewData.Type" xml:space="preserve">
+    <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;btn_PreviewData.Parent" xml:space="preserve">
+    <value>gb_Export</value>
+  </data>
+  <data name="&gt;&gt;btn_PreviewData.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="lbl_Status.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -574,7 +598,7 @@
     <value>gb_Export</value>
   </data>
   <data name="&gt;&gt;lbl_Status.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="btn_ExportLayer.Location" type="System.Drawing.Point, System.Drawing">
     <value>446, 21</value>
@@ -598,7 +622,7 @@
     <value>gb_Export</value>
   </data>
   <data name="&gt;&gt;btn_ExportLayer.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="btn_ExportAllLayer.Location" type="System.Drawing.Point, System.Drawing">
     <value>612, 21</value>
@@ -622,7 +646,7 @@
     <value>gb_Export</value>
   </data>
   <data name="&gt;&gt;btn_ExportAllLayer.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="gb_Export.Location" type="System.Drawing.Point, System.Drawing">
     <value>11, 471</value>

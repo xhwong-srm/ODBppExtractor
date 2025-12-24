@@ -50,6 +50,7 @@ namespace ODB___Extractor
             this.cbo_Origin = new SRMControl.SRMComboBox();
             this.lbl_Origin = new SRMControl.SRMLabel();
             this.btn_RefreshData = new SRMControl.SRMButton();
+            this.btn_PreviewData = new SRMControl.SRMButton();
             this.gb_Export = new SRMControl.SRMGroupBox();
             this.lbl_Status = new SRMControl.SRMLabel();
             this.btn_ExportLayer = new SRMControl.SRMButton();
@@ -244,9 +245,17 @@ namespace ODB___Extractor
             this.btn_RefreshData.UseVisualStyleBackColor = true;
             this.btn_RefreshData.Click += new System.EventHandler(this.btn_RefreshData_Click);
             // 
+            // btn_PreviewData
+            // 
+            resources.ApplyResources(this.btn_PreviewData, "btn_PreviewData");
+            this.btn_PreviewData.Name = "btn_PreviewData";
+            this.btn_PreviewData.UseVisualStyleBackColor = true;
+            this.btn_PreviewData.Click += new System.EventHandler(this.btn_PreviewData_Click);
+            // 
             // gb_Export
             // 
             this.gb_Export.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(150)))), ((int)(((byte)(185)))));
+            this.gb_Export.Controls.Add(this.btn_PreviewData);
             this.gb_Export.Controls.Add(this.lbl_Status);
             this.gb_Export.Controls.Add(this.btn_ExportLayer);
             this.gb_Export.Controls.Add(this.btn_ExportAllLayer);
@@ -320,5 +329,6 @@ namespace ODB___Extractor
         private SRMControl.SRMLabel lbl_Origin;
         private SRMControl.SRMCheckBox chk_FlipXAxis;
         private SRMControl.SRMCheckBox chk_FlipYAxis;
+        private SRMControl.SRMButton btn_PreviewData;
     }
 }

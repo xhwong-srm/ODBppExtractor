@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using WK.Libraries.BetterFolderBrowserNS;
 
 namespace ODB___Extractor
@@ -164,6 +165,8 @@ namespace ODB___Extractor
         private void btn_ExportAllLayer_Click(object sender, EventArgs e) => ExportComponents(true);
 
         private void btn_ExportLayer_Click(object sender, EventArgs e) => ExportComponents(false);
+
+        private void btn_PreviewData_Click(object sender, EventArgs e) => ShowViewer();
 
         private async void txt_Path_TextChanged(object sender, EventArgs e)
         {
@@ -434,6 +437,7 @@ namespace ODB___Extractor
             btn_RefreshData.Enabled = enabled;
             btn_ExportLayer.Enabled = enabled;
             btn_ExportAllLayer.Enabled = enabled;
+            btn_PreviewData.Enabled = enabled;
             cbo_Origin.Enabled = enabled;
         }
 
@@ -649,5 +653,144 @@ namespace ODB___Extractor
         private void chk_FlipXAxis_CheckedChanged(object sender, EventArgs e) => HandleLayerSelectionChange();
 
         private void chk_FlipYAxis_CheckedChanged(object sender, EventArgs e) => HandleLayerSelectionChange();
+
+        private void ShowViewer()
+        {
+            if (_currentJobReport == null)
+            {
+                ShowError("Load an ODB++ job before previewing.");
+                return;
+            }
+
+            var step = cbo_Step.SelectedItem as ODBppExtractor.StepReport;
+            if (step == null)
+            {
+                ShowError("Select a step before previewing.");
+                return;
+            }
+
+            try
+            {
+                // Generate XML content for the viewer
+                var origin = IsOriginBottomLeftSelected()
+                    ? ODBppExtractor.CoordinateOrigin.BottomLeft
+                    : ODBppExtractor.CoordinateOrigin.TopLeft;
+
+                var flipOptions = BuildComponentPlacementFlipOptions();
+                
+                // Get selected layer or all layers
+                HashSet<string> layerFilter = null;
+                var selectedLayer = cbo_Layer.SelectedItem as ODBppExtractor.LayerReport;
+                if (selectedLayer != null && selectedLayer.Exists)
+                {
+                    layerFilter = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { selectedLayer.Name };
+                }
+
+                // Build XML for viewer
+                var xmlContent = GenerateViewerXml(_currentJobReport, origin, layerFilter, flipOptions);
+                
+                // Show viewer form
+                using (var viewerForm = new ViewerForm(xmlContent))
+                {
+                    viewerForm.ShowDialog(this);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Failed to open viewer: {ex.Message}");
+            }
+        }
+
+        private string GenerateViewerXml(
+            ODBppExtractor.JobReport report,
+            ODBppExtractor.CoordinateOrigin origin,
+            HashSet<string> layerFilter,
+            ODBppExtractor.ComponentPlacementFlipOptions flipOptions)
+        {
+            var placements = ODBppExtractor.GetComponentPlacements(
+                report,
+                topLeft: origin == ODBppExtractor.CoordinateOrigin.TopLeft,
+                flipOptions: flipOptions);
+
+            // Group by step and layer
+            var stepGroups = placements
+                .Where(p => layerFilter == null || layerFilter.Contains(p.Layer))
+                .GroupBy(p => p.Step)
+                .ToList();
+
+            var stepElements = new List<XElement>();
+
+            foreach (var stepGroup in stepGroups)
+            {
+                var stepName = stepGroup.Key;
+                var stepReport = report.Steps.FirstOrDefault(s => 
+                    string.Equals(s.Name, stepName, StringComparison.OrdinalIgnoreCase));
+
+                if (stepReport == null)
+                    continue;
+
+                var layerGroups = stepGroup.GroupBy(p => p.Layer).ToList();
+                var layerElements = new List<XElement>();
+
+                foreach (var layerGroup in layerGroups)
+                {
+                    var layerName = layerGroup.Key;
+                    var layerReport = stepReport.Layers.FirstOrDefault(l => 
+                        string.Equals(l.Name, layerName, StringComparison.OrdinalIgnoreCase));
+
+                    if (layerReport == null)
+                        continue;
+
+                    var componentElements = layerGroup.Select(placement => new XElement("component",
+                        new XAttribute("name", placement.ComponentName ?? string.Empty),
+                        new XAttribute("rotation", placement.Rotation),
+                        new XAttribute("shape", "rect"),
+                        new XAttribute("packageName", placement.PackageName ?? string.Empty),
+                        new XAttribute("centerX", placement.CenterX),
+                        new XAttribute("centerY", placement.CenterY),
+                        new XAttribute("width", placement.Width),
+                        new XAttribute("length", placement.Length)
+                    )).ToList();
+
+                    var layerElement = new XElement("layer",
+                        new XAttribute("name", layerName),
+                        new XAttribute("unit", layerReport.Components?.Unit ?? stepReport.Unit ?? "MM"),
+                        componentElements);
+
+                    layerElements.Add(layerElement);
+                }
+
+                var width = stepReport.ProfileBoundingBox?.MaxX - stepReport.ProfileBoundingBox?.MinX ?? 0;
+                var length = stepReport.ProfileBoundingBox?.MaxY - stepReport.ProfileBoundingBox?.MinY ?? 0;
+
+                var stepElement = new XElement("step",
+                    new XAttribute("name", stepName),
+                    new XAttribute("unit", stepReport.Unit ?? "MM"),
+                    new XAttribute("width", FormatDimension(width)),
+                    new XAttribute("length", FormatDimension(length)),
+                    layerElements);
+
+                stepElements.Add(stepElement);
+            }
+
+            var componentCount = stepElements.Sum(step => 
+                step.Elements("layer").Sum(layer => layer.Elements("component").Count()));
+
+            var originText = origin == ODBppExtractor.CoordinateOrigin.TopLeft ? "top-left" : "bottom-left";
+
+            var boardsElement = new XElement("boards",
+                new XAttribute("generatedAt", report.ExtractedAt.ToString("o")),
+                new XAttribute("origin", originText),
+                new XAttribute("count", componentCount),
+                stepElements);
+
+            var doc = new XDocument(boardsElement);
+            
+            using (var stringWriter = new StringWriter())
+            {
+                doc.Save(stringWriter);
+                return stringWriter.ToString();
+            }
+        }
     }
 }
