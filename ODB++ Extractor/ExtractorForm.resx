@@ -271,7 +271,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Step.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>7</value>
   </data>
   <data name="lbl_Layer.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -298,7 +298,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Layer.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>9</value>
   </data>
   <data name="cbo_Step.Location" type="System.Drawing.Point, System.Drawing">
     <value>63, 29</value>
@@ -319,7 +319,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;cbo_Step.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>10</value>
   </data>
   <data name="cbo_Layer.Location" type="System.Drawing.Point, System.Drawing">
     <value>280, 29</value>
@@ -340,7 +340,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;cbo_Layer.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>8</value>
   </data>
   <data name="dgv_Data.Location" type="System.Drawing.Point, System.Drawing">
     <value>19, 69</value>
@@ -364,13 +364,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;dgv_Data.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>6</value>
   </data>
   <data name="lbl_Statistic.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="lbl_Statistic.Location" type="System.Drawing.Point, System.Drawing">
-    <value>16, 345</value>
+    <value>16, 349</value>
   </data>
   <data name="lbl_Statistic.Size" type="System.Drawing.Size, System.Drawing">
     <value>57, 17</value>
@@ -391,7 +391,61 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Statistic.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>5</value>
+  </data>
+  <data name="chk_FlipYAxis.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="chk_FlipYAxis.Location" type="System.Drawing.Point, System.Drawing">
+    <value>618, 345</value>
+  </data>
+  <data name="chk_FlipYAxis.Size" type="System.Drawing.Size, System.Drawing">
+    <value>124, 24</value>
+  </data>
+  <data name="chk_FlipYAxis.TabIndex" type="System.Int32, mscorlib">
+    <value>13</value>
+  </data>
+  <data name="chk_FlipYAxis.Text" xml:space="preserve">
+    <value>Flip Y Axis</value>
+  </data>
+  <data name="&gt;&gt;chk_FlipYAxis.Name" xml:space="preserve">
+    <value>chk_FlipYAxis</value>
+  </data>
+  <data name="&gt;&gt;chk_FlipYAxis.Type" xml:space="preserve">
+    <value>SRMControl.SRMCheckBox, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;chk_FlipYAxis.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;chk_FlipYAxis.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="chk_FlipXAxis.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="chk_FlipXAxis.Location" type="System.Drawing.Point, System.Drawing">
+    <value>488, 345</value>
+  </data>
+  <data name="chk_FlipXAxis.Size" type="System.Drawing.Size, System.Drawing">
+    <value>124, 24</value>
+  </data>
+  <data name="chk_FlipXAxis.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="chk_FlipXAxis.Text" xml:space="preserve">
+    <value>Flip X Axis</value>
+  </data>
+  <data name="&gt;&gt;chk_FlipXAxis.Name" xml:space="preserve">
+    <value>chk_FlipXAxis</value>
+  </data>
+  <data name="&gt;&gt;chk_FlipXAxis.Type" xml:space="preserve">
+    <value>SRMControl.SRMCheckBox, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;chk_FlipXAxis.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;chk_FlipXAxis.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <data name="cbo_Origin.Location" type="System.Drawing.Point, System.Drawing">
     <value>506, 29</value>
@@ -400,7 +454,7 @@
     <value>130, 23</value>
   </data>
   <data name="cbo_Origin.TabIndex" type="System.Int32, mscorlib">
-    <value>15</value>
+    <value>10</value>
   </data>
   <data name="&gt;&gt;cbo_Origin.Name" xml:space="preserve">
     <value>cbo_Origin</value>
@@ -412,7 +466,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;cbo_Origin.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>2</value>
   </data>
   <data name="lbl_Origin.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -442,7 +496,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Origin.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>3</value>
   </data>
   <data name="btn_RefreshData.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -454,7 +508,7 @@
     <value>80, 38</value>
   </data>
   <data name="btn_RefreshData.TabIndex" type="System.Int32, mscorlib">
-    <value>13</value>
+    <value>11</value>
   </data>
   <data name="btn_RefreshData.Text" xml:space="preserve">
     <value>Refresh</value>
@@ -469,7 +523,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;btn_RefreshData.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>4</value>
   </data>
   <data name="gb_Data.Location" type="System.Drawing.Point, System.Drawing">
     <value>11, 88</value>
@@ -495,6 +549,21 @@
   <data name="&gt;&gt;gb_Data.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="lbl_Status.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbl_Status.Location" type="System.Drawing.Point, System.Drawing">
+    <value>15, 32</value>
+  </data>
+  <data name="lbl_Status.Size" type="System.Drawing.Size, System.Drawing">
+    <value>48, 17</value>
+  </data>
+  <data name="lbl_Status.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="lbl_Status.Text" xml:space="preserve">
+    <value>Status</value>
+  </data>
   <data name="&gt;&gt;lbl_Status.Name" xml:space="preserve">
     <value>lbl_Status</value>
   </data>
@@ -507,6 +576,18 @@
   <data name="&gt;&gt;lbl_Status.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="btn_ExportLayer.Location" type="System.Drawing.Point, System.Drawing">
+    <value>446, 21</value>
+  </data>
+  <data name="btn_ExportLayer.Size" type="System.Drawing.Size, System.Drawing">
+    <value>160, 38</value>
+  </data>
+  <data name="btn_ExportLayer.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
+  </data>
+  <data name="btn_ExportLayer.Text" xml:space="preserve">
+    <value>Export Current Layer</value>
+  </data>
   <data name="&gt;&gt;btn_ExportLayer.Name" xml:space="preserve">
     <value>btn_ExportLayer</value>
   </data>
@@ -518,6 +599,18 @@
   </data>
   <data name="&gt;&gt;btn_ExportLayer.ZOrder" xml:space="preserve">
     <value>1</value>
+  </data>
+  <data name="btn_ExportAllLayer.Location" type="System.Drawing.Point, System.Drawing">
+    <value>612, 21</value>
+  </data>
+  <data name="btn_ExportAllLayer.Size" type="System.Drawing.Size, System.Drawing">
+    <value>130, 38</value>
+  </data>
+  <data name="btn_ExportAllLayer.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
+  </data>
+  <data name="btn_ExportAllLayer.Text" xml:space="preserve">
+    <value>Export All Layer</value>
   </data>
   <data name="&gt;&gt;btn_ExportAllLayer.Name" xml:space="preserve">
     <value>btn_ExportAllLayer</value>
@@ -554,81 +647,6 @@
   </data>
   <data name="&gt;&gt;gb_Export.ZOrder" xml:space="preserve">
     <value>0</value>
-  </data>
-  <data name="lbl_Status.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="lbl_Status.Location" type="System.Drawing.Point, System.Drawing">
-    <value>15, 32</value>
-  </data>
-  <data name="lbl_Status.Size" type="System.Drawing.Size, System.Drawing">
-    <value>48, 17</value>
-  </data>
-  <data name="lbl_Status.TabIndex" type="System.Int32, mscorlib">
-    <value>12</value>
-  </data>
-  <data name="lbl_Status.Text" xml:space="preserve">
-    <value>Status</value>
-  </data>
-  <data name="&gt;&gt;lbl_Status.Name" xml:space="preserve">
-    <value>lbl_Status</value>
-  </data>
-  <data name="&gt;&gt;lbl_Status.Type" xml:space="preserve">
-    <value>SRMControl.SRMLabel, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;lbl_Status.Parent" xml:space="preserve">
-    <value>gb_Export</value>
-  </data>
-  <data name="&gt;&gt;lbl_Status.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="btn_ExportLayer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>446, 21</value>
-  </data>
-  <data name="btn_ExportLayer.Size" type="System.Drawing.Size, System.Drawing">
-    <value>160, 38</value>
-  </data>
-  <data name="btn_ExportLayer.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
-  </data>
-  <data name="btn_ExportLayer.Text" xml:space="preserve">
-    <value>Export Current Layer</value>
-  </data>
-  <data name="&gt;&gt;btn_ExportLayer.Name" xml:space="preserve">
-    <value>btn_ExportLayer</value>
-  </data>
-  <data name="&gt;&gt;btn_ExportLayer.Type" xml:space="preserve">
-    <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;btn_ExportLayer.Parent" xml:space="preserve">
-    <value>gb_Export</value>
-  </data>
-  <data name="&gt;&gt;btn_ExportLayer.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="btn_ExportAllLayer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>612, 21</value>
-  </data>
-  <data name="btn_ExportAllLayer.Size" type="System.Drawing.Size, System.Drawing">
-    <value>130, 38</value>
-  </data>
-  <data name="btn_ExportAllLayer.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
-  </data>
-  <data name="btn_ExportAllLayer.Text" xml:space="preserve">
-    <value>Export All Layer</value>
-  </data>
-  <data name="&gt;&gt;btn_ExportAllLayer.Name" xml:space="preserve">
-    <value>btn_ExportAllLayer</value>
-  </data>
-  <data name="&gt;&gt;btn_ExportAllLayer.Type" xml:space="preserve">
-    <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;btn_ExportAllLayer.Parent" xml:space="preserve">
-    <value>gb_Export</value>
-  </data>
-  <data name="&gt;&gt;btn_ExportAllLayer.ZOrder" xml:space="preserve">
-    <value>2</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

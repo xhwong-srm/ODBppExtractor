@@ -1768,7 +1768,7 @@ namespace ODB___Extractor
         public static IReadOnlyList<ComponentPlacementInfo> GetTopLeftComponentPlacements(JobReport report) =>
             GetComponentPlacements(report, topLeft: true);
 
-        public static IReadOnlyList<ComponentPlacementInfo> GetComponentPlacements(JobReport report, bool topLeft)
+        public static IReadOnlyList<ComponentPlacementInfo> GetComponentPlacements(JobReport report, bool topLeft, ComponentPlacementFlipOptions flipOptions = null)
         {
             if (report == null)
             {
@@ -1776,7 +1776,7 @@ namespace ODB___Extractor
             }
 
             var origin = topLeft ? CoordinateOrigin.TopLeft : CoordinateOrigin.BottomLeft;
-            var entries = BuildComponentPlacementEntries(report, origin, null);
+            var entries = BuildComponentPlacementEntries(report, origin, null, flipOptions);
             var placements = new List<ComponentPlacementInfo>(entries.Count);
             foreach (var entry in entries)
             {

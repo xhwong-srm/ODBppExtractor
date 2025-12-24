@@ -22,8 +22,6 @@ namespace ODB___Extractor
         private bool _suspendSelection;
         private bool _isLoading;
         private ODBppExtractor.JobReport _currentJobReport;
-        private IReadOnlyList<ODBppExtractor.ComponentPlacementInfo> _topLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
-        private IReadOnlyList<ODBppExtractor.ComponentPlacementInfo> _bottomLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
         private readonly string _workingDirectoryRoot;
 
         public ExtractorForm()
@@ -276,8 +274,6 @@ namespace ODB___Extractor
                 }
 
                 _currentJobReport = result.JobReport;
-                _topLeftPlacementData = ODBppExtractor.GetComponentPlacements(_currentJobReport, topLeft: true);
-                _bottomLeftPlacementData = ODBppExtractor.GetComponentPlacements(_currentJobReport, topLeft: false);
                 if (_currentJobReport?.Steps == null || _currentJobReport.Steps.Count == 0)
                 {
                     ResetUi("No steps were found in the ODB++ job.");
@@ -405,8 +401,6 @@ namespace ODB___Extractor
         private void ResetUi(string statusMessage = DefaultStatusText)
         {
             _currentJobReport = null;
-            _topLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
-            _bottomLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
             ClearVisuals();
             lbl_Status.Text = statusMessage;
         }
@@ -480,6 +474,8 @@ namespace ODB___Extractor
                 ? ODBppExtractor.CoordinateOrigin.BottomLeft
                 : ODBppExtractor.CoordinateOrigin.TopLeft;
 
+            var flipOptions = BuildComponentPlacementFlipOptions();
+
             IReadOnlyList<string> exportedPaths;
             try
             {
@@ -488,7 +484,8 @@ namespace ODB___Extractor
                     origin,
                     separateByLayer: true,
                     layerFilter,
-                    targetDirectory);
+                    targetDirectory,
+                    flipOptions: flipOptions);
             }
             catch (Exception ex)
             {
@@ -565,8 +562,6 @@ namespace ODB___Extractor
         private void ClearVisuals()
         {
             _suspendSelection = true;
-            _topLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
-            _bottomLeftPlacementData = Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
             cbo_Step.DataSource = null;
             cbo_Layer.DataSource = null;
             cbo_Step.Enabled = false;
@@ -588,7 +583,44 @@ namespace ODB___Extractor
 
         private IReadOnlyList<ODBppExtractor.ComponentPlacementInfo> GetCurrentPlacementData()
         {
-            return IsOriginBottomLeftSelected() ? _bottomLeftPlacementData : _topLeftPlacementData;
+            if (_currentJobReport == null)
+            {
+                return Array.Empty<ODBppExtractor.ComponentPlacementInfo>();
+            }
+
+            var origin = IsOriginBottomLeftSelected()
+                ? ODBppExtractor.CoordinateOrigin.BottomLeft
+                : ODBppExtractor.CoordinateOrigin.TopLeft;
+
+            var flipOptions = BuildComponentPlacementFlipOptions();
+            return ODBppExtractor.GetComponentPlacements(
+                _currentJobReport,
+                topLeft: origin == ODBppExtractor.CoordinateOrigin.TopLeft,
+                flipOptions: flipOptions);
+        }
+
+        private ODBppExtractor.ComponentPlacementFlipOptions BuildComponentPlacementFlipOptions()
+        {
+            var axis = ODBppExtractor.AxisFlip.None;
+            if (chk_FlipXAxis.Checked)
+            {
+                axis |= ODBppExtractor.AxisFlip.X;
+            }
+
+            if (chk_FlipYAxis.Checked)
+            {
+                axis |= ODBppExtractor.AxisFlip.Y;
+            }
+
+            if (axis == ODBppExtractor.AxisFlip.None)
+            {
+                return null;
+            }
+
+            return new ODBppExtractor.ComponentPlacementFlipOptions
+            {
+                Axes = axis
+            };
         }
 
         private string GetCurrentOriginLabel() =>
@@ -611,9 +643,11 @@ namespace ODB___Extractor
                 return;
             }
 
-            var step = cbo_Step.SelectedItem as ODBppExtractor.StepReport;
-            var layer = cbo_Layer.SelectedItem as ODBppExtractor.LayerReport;
-            DisplayLayerComponents(step, layer);
+            HandleLayerSelectionChange();
         }
+
+        private void chk_FlipXAxis_CheckedChanged(object sender, EventArgs e) => HandleLayerSelectionChange();
+
+        private void chk_FlipYAxis_CheckedChanged(object sender, EventArgs e) => HandleLayerSelectionChange();
     }
 }

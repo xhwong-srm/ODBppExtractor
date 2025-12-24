@@ -31,8 +31,8 @@ namespace ODB___Extractor
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExtractorForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.lbl_Path = new SRMControl.SRMLabel();
             this.txt_Path = new SRMControl.SRMInputBox();
             this.btn_BrowseDir = new SRMControl.SRMButton();
@@ -45,6 +45,8 @@ namespace ODB___Extractor
             this.dgv_Data = new System.Windows.Forms.DataGridView();
             this.lbl_Statistic = new SRMControl.SRMLabel();
             this.gb_Data = new SRMControl.SRMGroupBox();
+            this.chk_FlipYAxis = new SRMControl.SRMCheckBox();
+            this.chk_FlipXAxis = new SRMControl.SRMCheckBox();
             this.cbo_Origin = new SRMControl.SRMComboBox();
             this.lbl_Origin = new SRMControl.SRMLabel();
             this.btn_RefreshData = new SRMControl.SRMButton();
@@ -150,25 +152,25 @@ namespace ODB___Extractor
             this.dgv_Data.AllowUserToDeleteRows = false;
             this.dgv_Data.BackgroundColor = System.Drawing.Color.AliceBlue;
             this.dgv_Data.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.LightSkyBlue;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgv_Data.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.LightSkyBlue;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgv_Data.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dgv_Data.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             resources.ApplyResources(this.dgv_Data, "dgv_Data");
             this.dgv_Data.Name = "dgv_Data";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.Color.LightSkyBlue;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgv_Data.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.LightSkyBlue;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgv_Data.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.dgv_Data.RowHeadersVisible = false;
             this.dgv_Data.RowTemplate.Height = 24;
             // 
@@ -181,6 +183,8 @@ namespace ODB___Extractor
             // gb_Data
             // 
             this.gb_Data.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(150)))), ((int)(((byte)(185)))));
+            this.gb_Data.Controls.Add(this.chk_FlipYAxis);
+            this.gb_Data.Controls.Add(this.chk_FlipXAxis);
             this.gb_Data.Controls.Add(this.cbo_Origin);
             this.gb_Data.Controls.Add(this.lbl_Origin);
             this.gb_Data.Controls.Add(this.btn_RefreshData);
@@ -193,6 +197,28 @@ namespace ODB___Extractor
             resources.ApplyResources(this.gb_Data, "gb_Data");
             this.gb_Data.Name = "gb_Data";
             this.gb_Data.TabStop = false;
+            // 
+            // chk_FlipYAxis
+            // 
+            this.chk_FlipYAxis.CheckedColor = System.Drawing.Color.GreenYellow;
+            resources.ApplyResources(this.chk_FlipYAxis, "chk_FlipYAxis");
+            this.chk_FlipYAxis.Name = "chk_FlipYAxis";
+            this.chk_FlipYAxis.Selected = false;
+            this.chk_FlipYAxis.SelectedBorderColor = System.Drawing.Color.Red;
+            this.chk_FlipYAxis.UnCheckedColor = System.Drawing.Color.Red;
+            this.chk_FlipYAxis.UseVisualStyleBackColor = true;
+            this.chk_FlipYAxis.CheckedChanged += new System.EventHandler(this.chk_FlipYAxis_CheckedChanged);
+            // 
+            // chk_FlipXAxis
+            // 
+            this.chk_FlipXAxis.CheckedColor = System.Drawing.Color.GreenYellow;
+            resources.ApplyResources(this.chk_FlipXAxis, "chk_FlipXAxis");
+            this.chk_FlipXAxis.Name = "chk_FlipXAxis";
+            this.chk_FlipXAxis.Selected = false;
+            this.chk_FlipXAxis.SelectedBorderColor = System.Drawing.Color.Red;
+            this.chk_FlipXAxis.UnCheckedColor = System.Drawing.Color.Red;
+            this.chk_FlipXAxis.UseVisualStyleBackColor = true;
+            this.chk_FlipXAxis.CheckedChanged += new System.EventHandler(this.chk_FlipXAxis_CheckedChanged);
             // 
             // cbo_Origin
             // 
@@ -292,5 +318,7 @@ namespace ODB___Extractor
         private SRMControl.SRMButton btn_RefreshData;
         private SRMControl.SRMComboBox cbo_Origin;
         private SRMControl.SRMLabel lbl_Origin;
+        private SRMControl.SRMCheckBox chk_FlipXAxis;
+        private SRMControl.SRMCheckBox chk_FlipYAxis;
     }
 }
