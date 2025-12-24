@@ -78,6 +78,7 @@ namespace ODB___Extractor
             // 
             // lstComponents
             // 
+            this.lstComponents.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(210)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
             resources.ApplyResources(this.lstComponents, "lstComponents");
             this.lstComponents.FormattingEnabled = true;
             this.lstComponents.Name = "lstComponents";

@@ -204,9 +204,6 @@
   <data name="txt_Search.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
   </data>
-  <data name="txt_Search.Text" xml:space="preserve">
-    <value />
-  </data>
   <data name="&gt;&gt;txt_Search.Name" xml:space="preserve">
     <value>txt_Search</value>
   </data>

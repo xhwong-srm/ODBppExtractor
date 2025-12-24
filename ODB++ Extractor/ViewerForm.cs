@@ -29,6 +29,8 @@ namespace ODB___Extractor
         private int dragStartY = 0;
         private bool needsInitialFit = false;
         private bool suppressCenterOnListSelection;
+        private float minScale = 10f;
+        private float maxScale = 500f;
 
         public ViewerForm(string xmlContent = "")
         {
@@ -39,6 +41,8 @@ namespace ODB___Extractor
             this.UpdateStyles();
 
             InitializeComponent();
+            // Set placeholder (hint) text for search box
+            SetCueBanner(txt_Search, "Search components…");
             EnableCanvasDoubleBuffering();
             this.Shown += ViewerForm_Shown;
             canvasPanel.SizeChanged += CanvasPanel_SizeChanged;
@@ -383,7 +387,7 @@ namespace ODB___Extractor
         {
             var oldScale = scale;
             scale *= e.Delta > 0 ? 1.1f : 0.9f;
-            scale = Math.Max(10, Math.Min(500, scale));
+            scale = Math.Max(minScale, Math.Min(maxScale, scale));
 
             // Zoom towards mouse position
             var mx = e.X;
@@ -456,15 +460,21 @@ namespace ODB___Extractor
             var availWidth = Math.Max(1f, visibleWidth - padding * 2);
             var availHeight = Math.Max(1f, clientSize.Height - padding * 2);
 
-            var bounds = CalculateBoardBounds();
-            var boardWidth = Math.Max(1f, (float)(bounds.MaxX - bounds.MinX));
-            var boardHeight = Math.Max(1f, (float)(bounds.MaxY - bounds.MinY));
+            // Always fit to the physical board size (0..Width, 0..Length)
+            var boardMinX = 0.0;
+            var boardMinY = 0.0;
+            var boardWidth = Math.Max(1f, (float)boardData.Width);
+            var boardHeight = Math.Max(1f, (float)boardData.Length);
 
             var scaleX = availWidth / boardWidth;
             var scaleY = availHeight / boardHeight;
 
-            scale = Math.Min(scaleX, scaleY);
-            scale = Math.Max(10, Math.Min(500, scale));
+            // Compute dynamic zoom limits
+            minScale = Math.Max(0.0001f, Math.Min(scaleX, scaleY)); // cannot zoom out beyond full board fit
+            maxScale = ComputeMaxScaleForSmallestComponent(availWidth, availHeight);
+
+            // Set current scale to minScale (fit-to-view)
+            scale = minScale;
 
             var boardWidthScaled = boardWidth * scale;
             var boardHeightScaled = boardHeight * scale;
@@ -472,10 +482,38 @@ namespace ODB___Extractor
             var extraX = Math.Max(0f, availWidth - boardWidthScaled) / 2f;
             var extraY = Math.Max(0f, availHeight - boardHeightScaled) / 2f;
 
-            offsetX = padding + extraX - (float)(bounds.MinX * scale);
-            offsetY = padding + extraY - (float)(bounds.MinY * scale);
+            offsetX = padding + extraX - (float)(boardMinX * scale);
+            offsetY = padding + extraY - (float)(boardMinY * scale);
 
             canvasPanel.Invalidate();
+        }
+
+        private float ComputeMaxScaleForSmallestComponent(float availWidth, float availHeight)
+        {
+            if (boardData == null || boardData.AllComponents == null || boardData.AllComponents.Count == 0)
+            {
+                // Fallback if no components: allow a reasonable zoom-in headroom
+                return Math.Max(minScale * 10f, minScale);
+            }
+
+            // Determine the smallest component by area
+            var smallest = boardData.AllComponents
+                .OrderBy(c => Math.Max(0.000001, c.Width) * Math.Max(0.000001, c.Length))
+                .First();
+
+            var compW = (float)Math.Max(0.000001, smallest.Width);
+            var compH = (float)Math.Max(0.000001, smallest.Length);
+
+            // Max scale where the smallest component just fits the viewport
+            var fitScaleX = availWidth / compW;
+            var fitScaleY = availHeight / compH;
+            var componentFitScale = Math.Min(fitScaleX, fitScaleY);
+
+            // Ensure maxScale is at least minScale
+            var computed = Math.Max(minScale, componentFitScale);
+
+            // Provide a safety upper bound to avoid pathological values
+            return Math.Min(computed, minScale * 1000f);
         }
 
         private void DrawSelectedComponentInfo(Graphics g)
@@ -524,6 +562,33 @@ namespace ODB___Extractor
                     g.DrawString(line, font, textBrush, rectX + padding, textY);
                     textY += g.MeasureString(line, font).Height;
                 }
+            }
+        }
+
+        // Native cue banner (placeholder) support for TextBox on Windows Vista+
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, string lParam);
+
+        private const int EM_SETCUEBANNER = 0x1501;
+
+        private void SetCueBanner(TextBox textBox, string hint, bool showWhenFocused = true)
+        {
+            void Apply()
+            {
+                try
+                {
+                    SendMessage(textBox.Handle, EM_SETCUEBANNER, (IntPtr)(showWhenFocused ? 1 : 0), hint ?? string.Empty);
+                }
+                catch { /* ignore if OS does not support */ }
+            }
+
+            if (textBox.IsHandleCreated)
+            {
+                Apply();
+            }
+            else
+            {
+                textBox.HandleCreated += (s, e) => Apply();
             }
         }
 
