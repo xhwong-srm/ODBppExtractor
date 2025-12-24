@@ -34,6 +34,11 @@ namespace ODB___Extractor
             this.canvasPanel = new System.Windows.Forms.Panel();
             this.canvasMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.resetView = new System.Windows.Forms.ToolStripMenuItem();
+            this.backgroundSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.loadBackgroundMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearBackgroundMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toggleBackgroundLockMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetBackgroundTransformMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sidebarPanel = new System.Windows.Forms.Panel();
             this.lstComponents = new System.Windows.Forms.ListBox();
             this.txt_Search = new SRMControl.SRMInputBox();
@@ -59,7 +64,12 @@ namespace ODB___Extractor
             // 
             this.canvasMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.canvasMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.resetView});
+            this.resetView,
+            this.backgroundSeparator,
+            this.loadBackgroundMenuItem,
+            this.clearBackgroundMenuItem,
+            this.toggleBackgroundLockMenuItem,
+            this.resetBackgroundTransformMenuItem});
             this.canvasMenu.Name = "canvasMenu";
             resources.ApplyResources(this.canvasMenu, "canvasMenu");
             // 
@@ -68,6 +78,38 @@ namespace ODB___Extractor
             this.resetView.Name = "resetView";
             resources.ApplyResources(this.resetView, "resetView");
             this.resetView.Click += new System.EventHandler(this.resetView_Click);
+            // 
+            // backgroundSeparator
+            // 
+            this.backgroundSeparator.Name = "backgroundSeparator";
+            resources.ApplyResources(this.backgroundSeparator, "backgroundSeparator");
+            // 
+            // loadBackgroundMenuItem
+            // 
+            this.loadBackgroundMenuItem.Name = "loadBackgroundMenuItem";
+            this.loadBackgroundMenuItem.Text = "Load background image...";
+            this.loadBackgroundMenuItem.Click += new System.EventHandler(this.loadBackgroundMenuItem_Click);
+            // 
+            // clearBackgroundMenuItem
+            // 
+            this.clearBackgroundMenuItem.Name = "clearBackgroundMenuItem";
+            this.clearBackgroundMenuItem.Text = "Clear background";
+            this.clearBackgroundMenuItem.Click += new System.EventHandler(this.clearBackgroundMenuItem_Click);
+            // 
+            // toggleBackgroundLockMenuItem
+            // 
+            this.toggleBackgroundLockMenuItem.Checked = true;
+            this.toggleBackgroundLockMenuItem.CheckOnClick = true;
+            this.toggleBackgroundLockMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toggleBackgroundLockMenuItem.Name = "toggleBackgroundLockMenuItem";
+            this.toggleBackgroundLockMenuItem.Text = "Lock background";
+            this.toggleBackgroundLockMenuItem.Click += new System.EventHandler(this.toggleBackgroundLockMenuItem_Click);
+            // 
+            // resetBackgroundTransformMenuItem
+            // 
+            this.resetBackgroundTransformMenuItem.Name = "resetBackgroundTransformMenuItem";
+            this.resetBackgroundTransformMenuItem.Text = "Reset background alignment";
+            this.resetBackgroundTransformMenuItem.Click += new System.EventHandler(this.resetBackgroundTransformMenuItem_Click);
             // 
             // sidebarPanel
             // 
@@ -134,6 +176,11 @@ namespace ODB___Extractor
         private System.Windows.Forms.Panel sidebarPanel;
         private System.Windows.Forms.ContextMenuStrip canvasMenu;
         private System.Windows.Forms.ToolStripMenuItem resetView;
+        private System.Windows.Forms.ToolStripSeparator backgroundSeparator;
+        private System.Windows.Forms.ToolStripMenuItem loadBackgroundMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearBackgroundMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toggleBackgroundLockMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem resetBackgroundTransformMenuItem;
         private WK.Libraries.BetterFolderBrowserNS.BetterFolderBrowser betterFolderBrowser1;
         private SRMControl.SRMInputBox txt_Search;
         private System.Windows.Forms.ListBox lstComponents;

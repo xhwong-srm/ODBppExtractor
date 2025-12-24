@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Xml.Linq;
+using System.Drawing.Imaging;
 
 namespace ODB___Extractor
 {
@@ -32,6 +33,18 @@ namespace ODB___Extractor
         private float minScale = 10f;
         private float maxScale = 500f;
 
+        private Image backgroundImage;
+        private float backgroundWorldPerPixel = 1f;
+        private float backgroundScaleMultiplier = 1f;
+        private double backgroundOriginWorldX;
+        private double backgroundOriginWorldY;
+        private float backgroundOpacity = 0.55f;
+        private bool backgroundLocked = true;
+        private bool backgroundNeedsInit;
+        private bool isBackgroundDragging;
+        private int backgroundDragStartX;
+        private int backgroundDragStartY;
+
         public ViewerForm(string xmlContent = "")
         {
             _xmlContent = xmlContent;
@@ -43,11 +56,15 @@ namespace ODB___Extractor
             InitializeComponent();
             // Set placeholder (hint) text for search box
             SetCueBanner(txt_Search, "Search components…");
+            this.KeyPreview = true;
+            this.KeyDown += ViewerForm_KeyDown;
+            txt_Search.KeyDown += Txt_Search_KeyDown;
             EnableCanvasDoubleBuffering();
             this.Shown += ViewerForm_Shown;
             canvasPanel.SizeChanged += CanvasPanel_SizeChanged;
 
             LoadFromXml(xmlContent, autoFit: true, clearSearch: true);
+            UpdateBackgroundMenuItems();
         }
         private void ParseXmlData()
         {
@@ -119,6 +136,7 @@ namespace ODB___Extractor
 
             ParseXmlData();
             SetupUI();
+            backgroundNeedsInit = true;
 
             if (autoFit)
             {
@@ -219,7 +237,11 @@ namespace ODB___Extractor
             e.Graphics.Clear(Color.FromArgb(10, 10, 10));
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
+            TryInitializeBackgroundTransform();
+
             if (boardData == null || boardData.Layers.Count == 0) return;
+
+            DrawBackgroundImage(e.Graphics);
 
             // Draw board outline
             DrawBoard(e.Graphics);
@@ -274,6 +296,40 @@ namespace ODB___Extractor
             }
         }
 
+        private void DrawBackgroundImage(Graphics g)
+        {
+            if (backgroundImage == null)
+                return;
+
+            var worldPerPixel = Math.Max(0.000001f, backgroundWorldPerPixel * backgroundScaleMultiplier);
+            var destWorldWidth = backgroundImage.Width * worldPerPixel;
+            var destWorldHeight = backgroundImage.Height * worldPerPixel;
+
+            var destX = WorldToScreenX(backgroundOriginWorldX);
+            var destY = WorldToScreenY(backgroundOriginWorldY);
+            var destW = destWorldWidth * scale;
+            var destH = destWorldHeight * scale;
+
+            using (var attributes = new ImageAttributes())
+            {
+                var matrix = new ColorMatrix
+                {
+                    Matrix33 = Math.Max(0f, Math.Min(1f, backgroundOpacity))
+                };
+                attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+                g.DrawImage(
+                    backgroundImage,
+                    new Rectangle((int)Math.Round(destX), (int)Math.Round(destY), (int)Math.Round(destW), (int)Math.Round(destH)),
+                    0,
+                    0,
+                    backgroundImage.Width,
+                    backgroundImage.Height,
+                    GraphicsUnit.Pixel,
+                    attributes);
+            }
+        }
+
         private void DrawComponent(Graphics g, ComponentData comp)
         {
             var x = WorldToScreenX(comp.CenterX);
@@ -317,9 +373,23 @@ namespace ODB___Extractor
         }
         private double ScreenToWorldX(float x) => (x - offsetX) / scale;
         private double ScreenToWorldY(float y) => (y - offsetY) / scale;
+        private double ScreenDeltaToWorldX(float dx) => dx / scale;
+        private double ScreenDeltaToWorldY(float dy)
+        {
+            var originBottomLeft = string.Equals(boardData?.Origin, "bottom-left", StringComparison.OrdinalIgnoreCase);
+            return originBottomLeft ? -dy / scale : dy / scale;
+        }
 
         private void Canvas_MouseDown(object sender, MouseEventArgs e)
         {
+            if (backgroundImage != null && !backgroundLocked && Control.ModifierKeys.HasFlag(Keys.Control) && e.Button == MouseButtons.Left)
+            {
+                isBackgroundDragging = true;
+                backgroundDragStartX = e.X;
+                backgroundDragStartY = e.Y;
+                return;
+            }
+
             if (e.Button != MouseButtons.Left)
                 return;
 
@@ -373,6 +443,20 @@ namespace ODB___Extractor
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
+            if (isBackgroundDragging)
+            {
+                var dxWorld = ScreenDeltaToWorldX(e.X - backgroundDragStartX);
+                var dyWorld = ScreenDeltaToWorldY(e.Y - backgroundDragStartY);
+
+                backgroundOriginWorldX += dxWorld;
+                backgroundOriginWorldY += dyWorld;
+
+                backgroundDragStartX = e.X;
+                backgroundDragStartY = e.Y;
+                canvasPanel.Invalidate();
+                return;
+            }
+
             if (isDragging && e.Button == MouseButtons.Left)
             {
                 offsetX += e.X - dragStartX;
@@ -415,17 +499,26 @@ namespace ODB___Extractor
 
         private void Canvas_MouseUp(object sender, MouseEventArgs e)
         {
+            isBackgroundDragging = false;
             isDragging = false;
         }
 
         private void Canvas_MouseLeave(object sender, EventArgs e)
         {
+            isBackgroundDragging = false;
             hoveredComponent = null;
             canvasPanel.Invalidate();
         }
 
         private void Canvas_MouseWheel(object sender, MouseEventArgs e)
         {
+            if (backgroundImage != null && !backgroundLocked && Control.ModifierKeys.HasFlag(Keys.Control))
+            {
+                var factor = (float)Math.Pow(1.02, e.Delta / 120.0); // finer 2% steps per wheel tick
+                AdjustBackgroundZoom(factor);
+                return;
+            }
+
             var oldScale = scale;
             scale *= e.Delta > 0 ? 1.1f : 0.9f;
             scale = Math.Max(minScale, Math.Min(maxScale, scale));
@@ -449,9 +542,36 @@ namespace ODB___Extractor
             return sx >= x - w / 2 && sx <= x + w / 2 && sy >= y - h / 2 && sy <= y + h / 2;
         }
 
+        private void AdjustBackgroundZoom(float factor)
+        {
+            backgroundScaleMultiplier = Math.Max(0.001f, Math.Min(1000f, backgroundScaleMultiplier * factor));
+            canvasPanel.Invalidate();
+        }
+
+        private void Txt_Search_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Prevent search box from receiving the ctrl+plus/minus keystrokes used for background zoom
+            if (backgroundImage != null && !backgroundLocked && e.Control &&
+                (e.KeyCode == Keys.Oemplus || e.KeyCode == Keys.Add || e.KeyCode == Keys.OemMinus || e.KeyCode == Keys.Subtract))
+            {
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+            }
+        }
+
         // Designer event handlers
         private void txt_Search_TextChanged(object sender, EventArgs e)
         {
+            // Remove any invisible/control characters that may have been input
+            var text = txt_Search.Text;
+            var filtered = new string(text.Where(c => !char.IsControl(c) || c == '\b').ToArray());
+            if (filtered != text)
+            {
+                txt_Search.TextChanged -= txt_Search_TextChanged;
+                txt_Search.Text = filtered;
+                txt_Search.TextChanged += txt_Search_TextChanged;
+            }
+
             UpdateComponentList();
         }
 
@@ -486,6 +606,23 @@ namespace ODB___Extractor
             FitToView();
         }
 
+        private void ViewerForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (backgroundImage != null && !backgroundLocked && e.Control)
+            {
+                if (e.KeyCode == Keys.Oemplus || e.KeyCode == Keys.Add)
+                {
+                    AdjustBackgroundZoom(e.Shift ? 1.005f : 1.02f); // Shift for ultra-fine steps
+                    e.Handled = true;
+                }
+                else if (e.KeyCode == Keys.OemMinus || e.KeyCode == Keys.Subtract)
+                {
+                    AdjustBackgroundZoom(e.Shift ? 0.995f : 0.98f);
+                    e.Handled = true;
+                }
+            }
+        }
+
         private void FitToView()
         {
             if (boardData == null)
@@ -509,13 +646,14 @@ namespace ODB___Extractor
 
             var scaleX = availWidth / boardWidth;
             var scaleY = availHeight / boardHeight;
+            var boardFitScale = Math.Min(scaleX, scaleY);
 
-            // Compute dynamic zoom limits
-            minScale = Math.Max(0.0001f, Math.Min(scaleX, scaleY)); // cannot zoom out beyond full board fit
+            // Allow zooming out to show the board at 25% of the view
+            minScale = Math.Max(0.0001f, boardFitScale * 0.25f);
             maxScale = ComputeMaxScaleForSmallestComponent(availWidth, availHeight);
 
-            // Set current scale to minScale (fit-to-view)
-            scale = minScale;
+            // Start zoomed to the board fit while staying within the new limit
+            scale = Math.Max(minScale, Math.Min(boardFitScale, maxScale));
 
             var boardWidthScaled = boardWidth * scale;
             var boardHeightScaled = boardHeight * scale;
@@ -527,6 +665,23 @@ namespace ODB___Extractor
             offsetY = padding + extraY - (float)(boardMinY * scale);
 
             canvasPanel.Invalidate();
+        }
+
+        private void TryInitializeBackgroundTransform()
+        {
+            if (!backgroundNeedsInit || backgroundImage == null || boardData == null)
+                return;
+
+            var baseScaleX = boardData.Width > 0 ? (float)(boardData.Width / Math.Max(1, backgroundImage.Width)) : 1f;
+            var baseScaleY = boardData.Length > 0 ? (float)(boardData.Length / Math.Max(1, backgroundImage.Height)) : 1f;
+            backgroundWorldPerPixel = Math.Max(0.000001f, Math.Min(baseScaleX, baseScaleY));
+            backgroundScaleMultiplier = 1f;
+            backgroundOriginWorldX = 0;
+            backgroundOriginWorldY = string.Equals(boardData.Origin, "bottom-left", StringComparison.OrdinalIgnoreCase)
+                ? boardData.Length
+                : 0;
+
+            backgroundNeedsInit = false;
         }
 
         private float ComputeMaxScaleForSmallestComponent(float availWidth, float availHeight)
@@ -604,6 +759,108 @@ namespace ODB___Extractor
                     textY += g.MeasureString(line, font).Height;
                 }
             }
+        }
+
+        private void LoadBackgroundImageFromFile()
+        {
+            using (var dialog = new OpenFileDialog
+            {
+                Title = "Select background image",
+                Filter = "Images|*.png;*.jpg;*.jpeg;*.bmp;*.tif;*.tiff;*.gif",
+                Multiselect = false,
+                CheckFileExists = true,
+                CheckPathExists = true
+            })
+            {
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                    return;
+
+                try
+                {
+                    using (var loaded = Image.FromFile(dialog.FileName))
+                    {
+                        backgroundImage?.Dispose();
+                        backgroundImage = new Bitmap(loaded);
+                    }
+
+                    backgroundNeedsInit = true;
+                    SetBackgroundLocked(false);
+                    canvasPanel.Invalidate();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"Failed to load image: {ex.Message}", "Background", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void ClearBackgroundImage()
+        {
+            backgroundImage?.Dispose();
+            backgroundImage = null;
+            backgroundNeedsInit = false;
+            canvasPanel.Invalidate();
+        }
+
+        private void ResetBackgroundTransform()
+        {
+            backgroundNeedsInit = true;
+            TryInitializeBackgroundTransform();
+            canvasPanel.Invalidate();
+        }
+
+        private void SetBackgroundLocked(bool locked)
+        {
+            backgroundLocked = locked;
+            UpdateBackgroundMenuItems();
+        }
+
+        private void UpdateBackgroundMenuItems()
+        {
+            if (toggleBackgroundLockMenuItem != null)
+            {
+                toggleBackgroundLockMenuItem.Checked = backgroundLocked;
+            }
+
+            if (clearBackgroundMenuItem != null)
+            {
+                clearBackgroundMenuItem.Enabled = backgroundImage != null;
+            }
+
+            if (resetBackgroundTransformMenuItem != null)
+            {
+                resetBackgroundTransformMenuItem.Enabled = backgroundImage != null;
+            }
+        }
+
+        private void loadBackgroundMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadBackgroundImageFromFile();
+            UpdateBackgroundMenuItems();
+        }
+
+        private void clearBackgroundMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearBackgroundImage();
+            UpdateBackgroundMenuItems();
+        }
+
+        private void toggleBackgroundLockMenuItem_Click(object sender, EventArgs e)
+        {
+            var menuItem = sender as ToolStripMenuItem;
+            if (menuItem != null)
+            {
+                SetBackgroundLocked(menuItem.Checked);
+            }
+            else
+            {
+                SetBackgroundLocked(!backgroundLocked);
+            }
+        }
+
+        private void resetBackgroundTransformMenuItem_Click(object sender, EventArgs e)
+        {
+            ResetBackgroundTransform();
         }
 
         // Native cue banner (placeholder) support for TextBox on Windows Vista+
