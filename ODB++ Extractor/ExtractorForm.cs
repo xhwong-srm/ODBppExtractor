@@ -11,20 +11,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using ODB___Extractor.Properties;
 using WK.Libraries.BetterFolderBrowserNS;
 
 namespace ODB___Extractor
 {
     public partial class ExtractorForm : Form
     {
-        private const string DefaultStatusText = "Waiting for an ODB++ archive or directory.";
-        private const string DefaultStatisticText = "No component data loaded (top-left).";
+        private string DefaultStatusText => Localizer.Get("Extractor_DefaultStatusText");
+        private string DefaultStatisticText => Localizer.Get("Extractor_DefaultStatisticText");
 
         private bool _suspendSelection;
         private bool _isLoading;
         private ODBppExtractor.JobReport _currentJobReport;
         private readonly string _workingDirectoryRoot;
         private ViewerForm _viewerForm;
+        private static readonly string[] SupportedCultures = { "en", "zh-CHS" };
 
         public ExtractorForm()
         {
@@ -33,6 +35,9 @@ namespace ODB___Extractor
             ResetUi();
             InitializeOriginCombo();
             _workingDirectoryRoot = EnsureWorkingDirectory();
+            KeyPreview = true;
+            KeyDown += ExtractorForm_KeyDown;
+            ApplyLocalization();
         }
 
         private void btn_BrowseDir_Click(object sender, EventArgs e)
@@ -49,8 +54,8 @@ namespace ODB___Extractor
         {
             using (var dialog = new OpenFileDialog())
             {
-                dialog.Title = "Select file";
-                dialog.Filter = "Archives (*.tgz;*.zip;*.tar;*.tar.gz)|*.tgz;*.zip;*.tar;*.tar.gz";
+                dialog.Title = Localizer.Get("Extractor_SelectFileTitle");
+                dialog.Filter = Localizer.Get("Extractor_ArchiveFilter");
                 dialog.CheckFileExists = true;
                 dialog.CheckPathExists = true;
                 dialog.Multiselect = false;
@@ -60,7 +65,7 @@ namespace ODB___Extractor
                 {
                     if (!IsAllowedArchive(dialog.FileName))
                     {
-                        MessageBox.Show(this, "Only .tgz, .zip, .tar, or .tar.gz files are supported.", "Invalid file", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show(this, Localizer.Get("Extractor_InvalidFileMessage"), Localizer.Get("Extractor_InvalidFileTitle"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 
@@ -91,7 +96,7 @@ namespace ODB___Extractor
             var initialPath = ResolveInitialFolder(txt_Path.Text);
             using (var browser = new BetterFolderBrowser
             {
-                Title = "Select folder",
+                Title = Localizer.Get("Extractor_SelectFolderTitle"),
                 Multiselect = false,
                 RootFolder = string.IsNullOrWhiteSpace(initialPath) ? null : initialPath
             })
@@ -197,7 +202,7 @@ namespace ODB___Extractor
                 return;
             }
 
-            lbl_Status.Text = $"Step '{step.Name}' selected ({step.Layers.Count} layer(s)).";
+            lbl_Status.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Status_StepSelected"), step.Name, step.Layers.Count);
             lbl_Statistic.Text = BuildStepDimensionText(step);
             PopulateLayerCombo(step);
 
@@ -223,16 +228,16 @@ namespace ODB___Extractor
             dgv_Data.AutoGenerateColumns = false;
             dgv_Data.ReadOnly = true;
             dgv_Data.Columns.Clear();
-            var componentColumn = CreateTextColumn("ComponentName", "Component", DataGridViewAutoSizeColumnMode.Fill);
+            var componentColumn = CreateTextColumn("ComponentName", Localizer.Get("Extractor_Grid_Component"), DataGridViewAutoSizeColumnMode.Fill);
             componentColumn.MinimumWidth = 200;
             componentColumn.FillWeight = 2f;
             dgv_Data.Columns.Add(componentColumn);
-            dgv_Data.Columns.Add(CreateTextColumn("PackageName", "Package", DataGridViewAutoSizeColumnMode.AllCells));
-            dgv_Data.Columns.Add(CreateTextColumn("CenterX", "Center X", DataGridViewAutoSizeColumnMode.AllCells));
-            dgv_Data.Columns.Add(CreateTextColumn("CenterY", "Center Y", DataGridViewAutoSizeColumnMode.AllCells));
-            dgv_Data.Columns.Add(CreateTextColumn("Rotation", "Rotation", DataGridViewAutoSizeColumnMode.AllCells));
-            dgv_Data.Columns.Add(CreateTextColumn("Width", "Width", DataGridViewAutoSizeColumnMode.AllCells));
-            dgv_Data.Columns.Add(CreateTextColumn("Length", "Length", DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("PackageName", Localizer.Get("Extractor_Grid_Package"), DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("CenterX", Localizer.Get("Extractor_Grid_CenterX"), DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("CenterY", Localizer.Get("Extractor_Grid_CenterY"), DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("Rotation", Localizer.Get("Extractor_Grid_Rotation"), DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("Width", Localizer.Get("Extractor_Grid_Width"), DataGridViewAutoSizeColumnMode.AllCells));
+            dgv_Data.Columns.Add(CreateTextColumn("Length", Localizer.Get("Extractor_Grid_Length"), DataGridViewAutoSizeColumnMode.AllCells));
         }
 
         private static DataGridViewTextBoxColumn CreateTextColumn(string name, string header, DataGridViewAutoSizeColumnMode mode)
@@ -260,8 +265,8 @@ namespace ODB___Extractor
                 return;
             }
 
-            var friendlyName = string.IsNullOrWhiteSpace(path) ? "ODB++ job" : Path.GetFileName(path);
-            lbl_Status.Text = $"Loading '{friendlyName}'...";
+            var friendlyName = string.IsNullOrWhiteSpace(path) ? Localizer.Get("Extractor_FriendlyJobName") : Path.GetFileName(path);
+            lbl_Status.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Status_Loading"), friendlyName);
             ClearVisuals();
             BeginLoad();
 
@@ -276,27 +281,27 @@ namespace ODB___Extractor
                 var result = await Task.Run(() => ODBppExtractor.Extract(path, _workingDirectoryRoot, exportPreferences));
                 if (!result.IsSuccessful)
                 {
-                    ShowError(result.ErrorMessage ?? "Failed to load ODB++ job.");
-                    ResetUi("Failed to load ODB++ job.");
+                    ShowError(result.ErrorMessage ?? Localizer.Get("Extractor_Error_FailedLoad"));
+                    ResetUi(Localizer.Get("Extractor_Error_FailedLoad"));
                     return;
                 }
 
                 _currentJobReport = result.JobReport;
                 if (_currentJobReport?.Steps == null || _currentJobReport.Steps.Count == 0)
                 {
-                    ResetUi("No steps were found in the ODB++ job.");
+                    ResetUi(Localizer.Get("Extractor_Status_NoStepsFound"));
                     return;
                 }
 
                 PopulateSteps();
-                lbl_Status.Text = $"Loaded {_currentJobReport.Steps.Count} step(s).";
+                lbl_Status.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Status_LoadedSteps"), _currentJobReport.Steps.Count);
 
                 RefreshViewer(autoFit: true);
             }
             catch (Exception ex)
             {
-                ShowError($"Unexpected error while loading ODB++ job: {ex.Message}");
-                ResetUi("Failed to load ODB++ job.");
+                ShowError(string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Error_UnexpectedLoad"), ex.Message));
+                ResetUi(Localizer.Get("Extractor_Error_FailedLoad"));
             }
             finally
             {
@@ -310,7 +315,7 @@ namespace ODB___Extractor
             {
                 cbo_Step.DataSource = null;
                 cbo_Step.Enabled = false;
-                lbl_Status.Text = "No step entries available.";
+                lbl_Status.Text = Localizer.Get("Extractor_Status_NoStepEntries");
                 return;
             }
 
@@ -335,7 +340,7 @@ namespace ODB___Extractor
 
             if (stepReport.Layers == null || stepReport.Layers.Count == 0)
             {
-                lbl_Status.Text = $"Step '{stepReport.Name}' contains no component layers.";
+                lbl_Status.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Status_NoComponentLayers"), stepReport.Name);
                 return;
             }
 
@@ -358,15 +363,15 @@ namespace ODB___Extractor
 
             if (step == null || layer == null)
             {
-                lbl_Statistic.Text = $"{stepText} • Unit: {unitText} • Components count: 0";
-                lbl_Status.Text = "Select a layer to view data.";
+                lbl_Statistic.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Statistic_Format"), stepText, unitText, 0);
+                lbl_Status.Text = Localizer.Get("Extractor_Status_SelectLayer");
                 return;
             }
 
             if (!layer.Exists)
             {
-                lbl_Statistic.Text = $"{stepText} • Unit: {unitText} • Components count: 0";
-                lbl_Status.Text = $"Layer '{layer.Name}' was not found on disk.";
+                lbl_Statistic.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Statistic_Format"), stepText, unitText, 0);
+                lbl_Status.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Status_LayerNotFound"), layer.Name);
                 return;
             }
 
@@ -378,8 +383,8 @@ namespace ODB___Extractor
 
             if (placements.Count == 0)
             {
-                lbl_Statistic.Text = $"{stepText} • Unit: {unitText} • Components count: 0";
-                lbl_Status.Text = $"Layer '{layer.Name}' ({originLabel}) contains no components.";
+                lbl_Statistic.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Statistic_Format"), stepText, unitText, 0);
+                lbl_Status.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Status_NoComponents"), layer.Name, originLabel);
                 return;
             }
 
@@ -395,25 +400,25 @@ namespace ODB___Extractor
                     placement.Length);
             }
 
-            lbl_Statistic.Text = $"{stepText} • Unit: {unitText} • Components count: {placements.Count}";
-            lbl_Status.Text = $"Layer '{layer.Name}' ({originLabel}) contains {placements.Count} components.";
+            lbl_Statistic.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Statistic_Format"), stepText, unitText, placements.Count);
+            lbl_Status.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Status_Components"), layer.Name, originLabel, placements.Count);
         }
 
         private void ShowError(string message)
         {
             var text = string.IsNullOrWhiteSpace(message)
-                ? "An unknown error occurred while processing the ODB++ data."
+                ? Localizer.Get("Extractor_Error_UnknownProcessing")
                 : message;
 
-            MessageBox.Show(this, text, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(this, text, Localizer.Get("Common_ErrorTitle"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void ResetUi(string statusMessage = DefaultStatusText)
+        private void ResetUi(string statusMessage = null)
         {
             _currentJobReport = null;
             CloseViewer();
             ClearVisuals();
-            lbl_Status.Text = statusMessage;
+            lbl_Status.Text = statusMessage ?? DefaultStatusText;
         }
 
         private void BeginLoad()
@@ -453,7 +458,7 @@ namespace ODB___Extractor
         {
             if (_currentJobReport == null)
             {
-                ShowError("Load an ODB++ job before exporting.");
+                ShowError(Localizer.Get("Extractor_Error_LoadBeforeExport"));
                 return;
             }
 
@@ -468,14 +473,14 @@ namespace ODB___Extractor
                 var layerReport = cbo_Layer.SelectedItem as ODBppExtractor.LayerReport;
                 if (layerReport == null)
                 {
-                    ShowError("Select a layer before exporting.");
+                    ShowError(Localizer.Get("Extractor_Error_SelectLayerBeforeExport"));
                     return;
                 }
 
                 var layerName = layerReport.Name;
                 if (string.IsNullOrWhiteSpace(layerName))
                 {
-                    ShowError("Selected layer does not have a valid name.");
+                    ShowError(Localizer.Get("Extractor_Error_InvalidLayerName"));
                     return;
                 }
 
@@ -501,17 +506,17 @@ namespace ODB___Extractor
             }
             catch (Exception ex)
             {
-                ShowError($"Export failed: {ex.Message}");
+                ShowError(string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Error_ExportFailed"), ex.Message));
                 return;
             }
 
             if (exportedPaths == null || exportedPaths.Count == 0)
             {
-                MessageBox.Show(this, "No component reports were generated.", "Export result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, Localizer.Get("Extractor_Export_NoReports"), Localizer.Get("Extractor_Export_ResultTitle"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            MessageBox.Show(this, $"Component reports exported to:\n{targetDirectory}", "Export complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(this, string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Export_CompleteMessage"), targetDirectory), Localizer.Get("Extractor_Export_CompleteTitle"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private bool TrySelectExportDirectory(out string exportDirectory)
@@ -519,7 +524,7 @@ namespace ODB___Extractor
             exportDirectory = null;
             using (var browser = new BetterFolderBrowser
             {
-                Title = "Select export folder",
+                Title = Localizer.Get("Extractor_SelectExportFolderTitle"),
                 Multiselect = false
             })
             {
@@ -543,7 +548,7 @@ namespace ODB___Extractor
         {
             if (step == null)
             {
-                return "Dimension unavailable";
+                return Localizer.Get("Extractor_DimensionUnavailable");
             }
 
             if (step.ProfileBoundingBox.HasValue)
@@ -551,10 +556,10 @@ namespace ODB___Extractor
                 var bbox = step.ProfileBoundingBox.Value;
                 var width = FormatDimension(bbox.MaxX - bbox.MinX);
                 var length = FormatDimension(bbox.MaxY - bbox.MinY);
-                return $"Dimension: {width} x {length}";
+                return string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_DimensionFormat"), width, length);
             }
 
-            return "Dimension unavailable";
+            return Localizer.Get("Extractor_DimensionUnavailable");
         }
 
         private static string DetermineLayerUnit(ODBppExtractor.StepReport step, ODBppExtractor.LayerReport layer)
@@ -565,7 +570,7 @@ namespace ODB___Extractor
                 unit = step?.Unit;
             }
 
-            return string.IsNullOrWhiteSpace(unit) ? "unit unknown" : unit;
+            return string.IsNullOrWhiteSpace(unit) ? Localizer.Get("Extractor_UnitUnknown") : unit;
         }
 
         private static string FormatDimension(double value) =>
@@ -587,8 +592,8 @@ namespace ODB___Extractor
         {
             _suspendSelection = true;
             cbo_Origin.Items.Clear();
-            cbo_Origin.Items.Add("Top-left");
-            cbo_Origin.Items.Add("Bottom-left");
+            cbo_Origin.Items.Add(Localizer.Get("Extractor_Origin_TopLeft"));
+            cbo_Origin.Items.Add(Localizer.Get("Extractor_Origin_BottomLeft"));
             cbo_Origin.SelectedIndex = 0;
             _suspendSelection = false;
         }
@@ -636,7 +641,7 @@ namespace ODB___Extractor
         }
 
         private string GetCurrentOriginLabel() =>
-            IsOriginBottomLeftSelected() ? "bottom-left" : "top-left";
+            IsOriginBottomLeftSelected() ? Localizer.Get("Extractor_OriginLabel_BottomLeft") : Localizer.Get("Extractor_OriginLabel_TopLeft");
 
         private bool IsOriginBottomLeftSelected() =>
             cbo_Origin.SelectedIndex == 1;
@@ -662,18 +667,106 @@ namespace ODB___Extractor
 
         private void chk_FlipYAxis_CheckedChanged(object sender, EventArgs e) => HandleLayerSelectionChange();
 
+        private void ExtractorForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.Shift && e.KeyCode == Keys.L)
+            {
+                RotateCulture();
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+            }
+        }
+
+        private void RotateCulture()
+        {
+            var current = Settings.Default.UICulture ?? string.Empty;
+            var index = Array.FindIndex(SupportedCultures, code =>
+                string.Equals(code, current, StringComparison.OrdinalIgnoreCase));
+            if (index < 0)
+            {
+                index = 0;
+            }
+
+            var next = SupportedCultures[(index + 1) % SupportedCultures.Length];
+            Localizer.SetCulture(next, applyToOpenForms: true);
+
+            var languageName = GetLanguageDisplayName(next);
+            lbl_Status.Text = string.Format(
+                CultureInfo.CurrentCulture,
+                Localizer.Get("Extractor_Status_LanguageChanged"),
+                languageName);
+        }
+
+        private string GetLanguageDisplayName(string cultureCode)
+        {
+            if (string.Equals(cultureCode, "zh-CHS", StringComparison.OrdinalIgnoreCase))
+            {
+                return Localizer.Get("Extractor_Language_Chinese");
+            }
+
+            return Localizer.Get("Extractor_Language_English");
+        }
+
+        public void ApplyLocalization()
+        {
+            Localizer.Apply(this);
+            UpdateGridHeaders();
+            UpdateOriginCombo();
+            if (_currentJobReport == null)
+            {
+                lbl_Status.Text = DefaultStatusText;
+                lbl_Statistic.Text = DefaultStatisticText;
+            }
+            else
+            {
+                HandleLayerSelectionChange();
+            }
+        }
+
+        private void UpdateGridHeaders()
+        {
+            var headers = new Dictionary<string, string>
+            {
+                ["ComponentName"] = Localizer.Get("Extractor_Grid_Component"),
+                ["PackageName"] = Localizer.Get("Extractor_Grid_Package"),
+                ["CenterX"] = Localizer.Get("Extractor_Grid_CenterX"),
+                ["CenterY"] = Localizer.Get("Extractor_Grid_CenterY"),
+                ["Rotation"] = Localizer.Get("Extractor_Grid_Rotation"),
+                ["Width"] = Localizer.Get("Extractor_Grid_Width"),
+                ["Length"] = Localizer.Get("Extractor_Grid_Length")
+            };
+
+            foreach (DataGridViewColumn column in dgv_Data.Columns)
+            {
+                if (headers.TryGetValue(column.Name, out var header))
+                {
+                    column.HeaderText = header;
+                }
+            }
+        }
+
+        private void UpdateOriginCombo()
+        {
+            var selected = cbo_Origin.SelectedIndex;
+            InitializeOriginCombo();
+            if (selected >= 0 && selected < cbo_Origin.Items.Count)
+            {
+                cbo_Origin.SelectedIndex = selected;
+            }
+        }
+
         private void ShowViewer()
         {
             if (_currentJobReport == null)
             {
-                ShowError("Load an ODB++ job before previewing.");
+                ShowError(Localizer.Get("Extractor_Error_LoadBeforePreview"));
                 return;
             }
 
             var step = cbo_Step.SelectedItem as ODBppExtractor.StepReport;
             if (step == null)
             {
-                ShowError("Select a step before previewing.");
+                ShowError(Localizer.Get("Extractor_Error_SelectStepBeforePreview"));
                 return;
             }
 
@@ -696,7 +789,7 @@ namespace ODB___Extractor
             }
             catch (Exception ex)
             {
-                ShowError($"Failed to open viewer: {ex.Message}");
+                ShowError(string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Error_OpenViewerFailed"), ex.Message));
             }
         }
 

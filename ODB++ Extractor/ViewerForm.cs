@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.Xml.Linq;
 using System.Drawing.Imaging;
+using System.Globalization;
 
 namespace ODB___Extractor
 {
@@ -55,7 +56,7 @@ namespace ODB___Extractor
 
             InitializeComponent();
             // Set placeholder (hint) text for search box
-            SetCueBanner(txt_Search, "Search components…");
+            SetCueBanner(txt_Search, Localizer.Get("Viewer_SearchPlaceholder"));
             this.KeyPreview = true;
             this.KeyDown += ViewerForm_KeyDown;
             txt_Search.KeyDown += Txt_Search_KeyDown;
@@ -65,6 +66,15 @@ namespace ODB___Extractor
 
             LoadFromXml(xmlContent, autoFit: true, clearSearch: true);
             UpdateBackgroundMenuItems();
+            ApplyLocalization();
+        }
+
+        public void ApplyLocalization()
+        {
+            var searchText = txt_Search.Text;
+            Localizer.Apply(this);
+            txt_Search.Text = searchText;
+            SetCueBanner(txt_Search, Localizer.Get("Viewer_SearchPlaceholder"));
         }
         private void ParseXmlData()
         {
@@ -83,22 +93,22 @@ namespace ODB___Extractor
                 // Parse steps and layers
                 foreach (var stepEl in root.Elements("step"))
                 {
-                    var stepName = stepEl.Attribute("name")?.Value ?? "Step";
+                    var stepName = stepEl.Attribute("name")?.Value ?? Localizer.Get("Viewer_DefaultStepName");
                     boardData.Unit = stepEl.Attribute("unit")?.Value ?? "MM";
                     boardData.Width = double.TryParse(stepEl.Attribute("width")?.Value, out var w) ? w : 100;
                     boardData.Length = double.TryParse(stepEl.Attribute("length")?.Value, out var l) ? l : 100;
 
                     foreach (var layerEl in stepEl.Elements("layer"))
                     {
-                        var layerName = layerEl.Attribute("name")?.Value ?? "Unknown";
+                        var layerName = layerEl.Attribute("name")?.Value ?? Localizer.Get("Viewer_DefaultLayerName");
                         var layerData = new LayerData { Name = layerName };
 
                         foreach (var compEl in layerEl.Elements("component"))
                         {
                             var comp = new ComponentData
                             {
-                                Name = compEl.Attribute("name")?.Value ?? "Unknown",
-                                PackageName = compEl.Attribute("packageName")?.Value ?? "N/A",
+                                Name = compEl.Attribute("name")?.Value ?? Localizer.Get("Viewer_DefaultComponentName"),
+                                PackageName = compEl.Attribute("packageName")?.Value ?? Localizer.Get("Viewer_DefaultPackageName"),
                                 CenterX = double.TryParse(compEl.Attribute("centerX")?.Value, out var cx) ? cx : 0,
                                 CenterY = double.TryParse(compEl.Attribute("centerY")?.Value, out var cy) ? cy : 0,
                                 Width = double.TryParse(compEl.Attribute("width")?.Value, out var wd) ? wd : 5,
@@ -117,7 +127,11 @@ namespace ODB___Extractor
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error parsing XML: {ex.Message}", "Parse Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    string.Format(CultureInfo.CurrentCulture, Localizer.Get("Viewer_ParseErrorMessage"), ex.Message),
+                    Localizer.Get("Viewer_ParseErrorTitle"),
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
@@ -158,13 +172,17 @@ namespace ODB___Extractor
             needsInitialFit = false;
             if (boardData == null)
             {
-                MessageBox.Show("Error: Board data is null. XML may not have been parsed correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Localizer.Get("Viewer_BoardDataNullMessage"), Localizer.Get("Common_ErrorTitle"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if (boardData.Layers.Count == 0)
             {
-                MessageBox.Show("No layers found in the ODB++ data.\n\nXML Content Length: " + _xmlContent?.Length, "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(
+                    string.Format(CultureInfo.CurrentCulture, Localizer.Get("Viewer_NoLayersMessage"), _xmlContent?.Length),
+                    Localizer.Get("Common_InfoTitle"),
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
                 return;
             }
 
@@ -720,11 +738,11 @@ namespace ODB___Extractor
             var clientSize = canvasPanel.ClientSize;
             var lines = new[]
             {
-                $"Package: {selectedComponent.PackageName}",
-                $"Position: {selectedComponent.CenterX:F2}, {selectedComponent.CenterY:F2}",
-                $"Width: {selectedComponent.Width:F2}",
-                $"Length: {selectedComponent.Length:F2}",
-                $"Rotation: {selectedComponent.Rotation:F2}°"
+                string.Format(CultureInfo.CurrentCulture, Localizer.Get("Viewer_ComponentInfo_Package"), selectedComponent.PackageName),
+                string.Format(CultureInfo.CurrentCulture, Localizer.Get("Viewer_ComponentInfo_Position"), selectedComponent.CenterX, selectedComponent.CenterY),
+                string.Format(CultureInfo.CurrentCulture, Localizer.Get("Viewer_ComponentInfo_Width"), selectedComponent.Width),
+                string.Format(CultureInfo.CurrentCulture, Localizer.Get("Viewer_ComponentInfo_Length"), selectedComponent.Length),
+                string.Format(CultureInfo.CurrentCulture, Localizer.Get("Viewer_ComponentInfo_Rotation"), selectedComponent.Rotation)
             };
 
             using (var font = new Font("Segoe UI", 9, FontStyle.Regular, GraphicsUnit.Point))
@@ -765,8 +783,8 @@ namespace ODB___Extractor
         {
             using (var dialog = new OpenFileDialog
             {
-                Title = "Select background image",
-                Filter = "Images|*.png;*.jpg;*.jpeg;*.bmp;*.tif;*.tiff;*.gif",
+                Title = Localizer.Get("Viewer_BackgroundImageTitle"),
+                Filter = Localizer.Get("Viewer_BackgroundImageFilter"),
                 Multiselect = false,
                 CheckFileExists = true,
                 CheckPathExists = true
@@ -789,7 +807,12 @@ namespace ODB___Extractor
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(this, $"Failed to load image: {ex.Message}", "Background", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(
+                        this,
+                        string.Format(CultureInfo.CurrentCulture, Localizer.Get("Viewer_BackgroundLoadFailed"), ex.Message),
+                        Localizer.Get("Viewer_BackgroundTitle"),
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
                 }
             }
         }

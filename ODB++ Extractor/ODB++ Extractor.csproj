@@ -114,6 +114,7 @@
     <Compile Include="ExtractorForm.Designer.cs">
       <DependentUpon>ExtractorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Localizer.cs" />
     <Compile Include="ODBppExtractor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

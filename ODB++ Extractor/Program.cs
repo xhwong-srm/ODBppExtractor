@@ -14,6 +14,7 @@ namespace ODB___Extractor
         [STAThread]
         static void Main()
         {
+            Localizer.Initialize();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ExtractorForm());
