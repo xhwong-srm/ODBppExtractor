@@ -1768,7 +1768,10 @@ namespace ODB___Extractor
         public static IReadOnlyList<ComponentPlacementInfo> GetTopLeftComponentPlacements(JobReport report) =>
             GetComponentPlacements(report, topLeft: true);
 
-        public static IReadOnlyList<ComponentPlacementInfo> GetComponentPlacements(JobReport report, bool topLeft, ComponentPlacementFlipOptions flipOptions = null)
+        public static IReadOnlyList<ComponentPlacementInfo> GetTopLeftComponentPlacements(JobReport report, string targetUnit, ComponentPlacementFlipOptions flipOptions = null) =>
+            GetComponentPlacements(report, topLeft: true, flipOptions: flipOptions, targetUnit: targetUnit);
+
+        public static IReadOnlyList<ComponentPlacementInfo> GetComponentPlacements(JobReport report, bool topLeft, ComponentPlacementFlipOptions flipOptions = null, string targetUnit = null)
         {
             if (report == null)
             {
@@ -1778,9 +1781,10 @@ namespace ODB___Extractor
             var origin = topLeft ? CoordinateOrigin.TopLeft : CoordinateOrigin.BottomLeft;
             var entries = BuildComponentPlacementEntries(report, origin, null, flipOptions);
             var placements = new List<ComponentPlacementInfo>(entries.Count);
+            var normalizedTarget = NormalizeUnit(targetUnit);
             foreach (var entry in entries)
             {
-                var placement = ConvertToPlacementInfo(entry);
+                var placement = ConvertToPlacementInfo(entry, normalizedTarget);
                 if (placement != null)
                 {
                     placements.Add(placement);
@@ -1790,7 +1794,7 @@ namespace ODB___Extractor
             return placements;
         }
 
-        private static ComponentPlacementInfo ConvertToPlacementInfo(LayerComponentEntry entry)
+        private static ComponentPlacementInfo ConvertToPlacementInfo(LayerComponentEntry entry, string targetUnit)
         {
             var componentElement = entry?.Component;
             if (componentElement == null)
@@ -1800,16 +1804,44 @@ namespace ODB___Extractor
 
             string AttributeValue(string name) => componentElement.Attribute(name)?.Value ?? string.Empty;
 
+            var sourceUnit = NormalizeUnit(entry.Unit);
+            var resolvedTarget = string.IsNullOrEmpty(targetUnit) ? sourceUnit : targetUnit;
+            var centerX = ConvertPlacementValue(AttributeValue("centerX"), sourceUnit, resolvedTarget);
+            var centerY = ConvertPlacementValue(AttributeValue("centerY"), sourceUnit, resolvedTarget);
+            var width = ConvertPlacementValue(AttributeValue("width"), sourceUnit, resolvedTarget);
+            var length = ConvertPlacementValue(AttributeValue("length"), sourceUnit, resolvedTarget);
+
             return new ComponentPlacementInfo(
                 entry.Step,
                 entry.Layer,
                 AttributeValue("name"),
                 AttributeValue("packageName"),
                 AttributeValue("rotation"),
-                AttributeValue("centerX"),
-                AttributeValue("centerY"),
-                AttributeValue("width"),
-                AttributeValue("length"));
+                centerX,
+                centerY,
+                width,
+                length);
+        }
+
+        private static string ConvertPlacementValue(string value, string fromUnit, string toUnit)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+
+            if (string.IsNullOrEmpty(fromUnit) || string.IsNullOrEmpty(toUnit))
+            {
+                return value;
+            }
+
+            if (!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed))
+            {
+                return value;
+            }
+
+            var converted = ConvertUnits(parsed, fromUnit, toUnit);
+            return FormatDouble(converted);
         }
 
         private static bool IsLayerAllowed(string layerName, HashSet<string> layerFilter)
@@ -2465,6 +2497,9 @@ namespace ODB___Extractor
 
             return value;
         }
+
+        public static double ConvertUnitValue(double value, string fromUnit, string toUnit) =>
+            ConvertUnits(value, fromUnit, toUnit);
 
         /// <summary>
         /// Converts the profile bounding box minimums into the desired unit so component coordinates can

@@ -34,9 +34,11 @@ namespace ODB___Extractor
             InitializeDataGrid();
             ResetUi();
             InitializeOriginCombo();
+            InitializeUnitCombo();
             _workingDirectoryRoot = EnsureWorkingDirectory();
             KeyPreview = true;
             KeyDown += ExtractorForm_KeyDown;
+            cbo_Unit.SelectedIndexChanged += cbo_Unit_SelectedIndexChanged;
             ApplyLocalization();
         }
 
@@ -203,7 +205,7 @@ namespace ODB___Extractor
             }
 
             lbl_Status.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Status_StepSelected"), step.Name, step.Layers.Count);
-            lbl_Statistic.Text = BuildStepDimensionText(step);
+            lbl_Statistic.Text = BuildStepDimensionText(step, GetTargetUnit());
             PopulateLayerCombo(step);
 
             RefreshViewer(autoFit: true);
@@ -293,6 +295,7 @@ namespace ODB___Extractor
                     return;
                 }
 
+                SelectDefaultUnitFromJob(_currentJobReport);
                 PopulateSteps();
                 lbl_Status.Text = string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_Status_LoadedSteps"), _currentJobReport.Steps.Count);
 
@@ -357,7 +360,7 @@ namespace ODB___Extractor
         private void DisplayLayerComponents(ODBppExtractor.StepReport step, ODBppExtractor.LayerReport layer)
         {
             dgv_Data.Rows.Clear();
-            var stepText = BuildStepDimensionText(step);
+            var stepText = BuildStepDimensionText(step, GetTargetUnit());
             var unitText = DetermineLayerUnit(step, layer);
             var originLabel = GetCurrentOriginLabel();
 
@@ -452,6 +455,7 @@ namespace ODB___Extractor
             btn_ExportAllLayer.Enabled = enabled;
             btn_PreviewData.Enabled = enabled;
             cbo_Origin.Enabled = enabled;
+            cbo_Unit.Enabled = enabled;
         }
 
         private void ExportComponents(bool exportAllLayers)
@@ -502,6 +506,7 @@ namespace ODB___Extractor
                     separateByLayer: true,
                     layerFilter,
                     targetDirectory,
+                    targetUnit: GetTargetUnit(),
                     flipOptions: flipOptions);
             }
             catch (Exception ex)
@@ -544,7 +549,7 @@ namespace ODB___Extractor
             }
         }
 
-        private static string BuildStepDimensionText(ODBppExtractor.StepReport step)
+        private static string BuildStepDimensionText(ODBppExtractor.StepReport step, string targetUnit)
         {
             if (step == null)
             {
@@ -554,16 +559,31 @@ namespace ODB___Extractor
             if (step.ProfileBoundingBox.HasValue)
             {
                 var bbox = step.ProfileBoundingBox.Value;
-                var width = FormatDimension(bbox.MaxX - bbox.MinX);
-                var length = FormatDimension(bbox.MaxY - bbox.MinY);
+                var sourceUnit = step.Unit ?? "MM";
+                var widthValue = bbox.MaxX - bbox.MinX;
+                var lengthValue = bbox.MaxY - bbox.MinY;
+                if (!string.IsNullOrWhiteSpace(targetUnit))
+                {
+                    widthValue = ODBppExtractor.ConvertUnitValue(widthValue, sourceUnit, targetUnit);
+                    lengthValue = ODBppExtractor.ConvertUnitValue(lengthValue, sourceUnit, targetUnit);
+                }
+
+                var width = FormatDimension(widthValue);
+                var length = FormatDimension(lengthValue);
                 return string.Format(CultureInfo.CurrentCulture, Localizer.Get("Extractor_DimensionFormat"), width, length);
             }
 
             return Localizer.Get("Extractor_DimensionUnavailable");
         }
 
-        private static string DetermineLayerUnit(ODBppExtractor.StepReport step, ODBppExtractor.LayerReport layer)
+        private string DetermineLayerUnit(ODBppExtractor.StepReport step, ODBppExtractor.LayerReport layer)
         {
+            var selected = GetSelectedUnitDisplay();
+            if (!string.IsNullOrWhiteSpace(selected))
+            {
+                return selected;
+            }
+
             var unit = layer?.Components?.Unit;
             if (string.IsNullOrWhiteSpace(unit))
             {
@@ -598,6 +618,62 @@ namespace ODB___Extractor
             _suspendSelection = false;
         }
 
+        private void InitializeUnitCombo()
+        {
+            cbo_Unit.DisplayMember = nameof(UnitChoice.Display);
+            UpdateUnitCombo();
+        }
+
+        private void UpdateUnitCombo()
+        {
+            var selectedUnit = GetSelectedUnit();
+            _suspendSelection = true;
+            cbo_Unit.Items.Clear();
+            cbo_Unit.Items.Add(new UnitChoice("MM", Localizer.Get("Extractor_Unit_MM")));
+            cbo_Unit.Items.Add(new UnitChoice("INCH", Localizer.Get("Extractor_Unit_INCH")));
+            SetUnitSelection(selectedUnit);
+            _suspendSelection = false;
+        }
+
+        private void SetUnitSelection(string unit)
+        {
+            if (cbo_Unit.Items.Count == 0)
+            {
+                return;
+            }
+
+            var normalized = NormalizeUnit(unit);
+            if (!string.IsNullOrEmpty(normalized))
+            {
+                for (var i = 0; i < cbo_Unit.Items.Count; i++)
+                {
+                    if (cbo_Unit.Items[i] is UnitChoice choice &&
+                        string.Equals(choice.Unit, normalized, StringComparison.OrdinalIgnoreCase))
+                    {
+                        cbo_Unit.SelectedIndex = i;
+                        return;
+                    }
+                }
+            }
+
+            cbo_Unit.SelectedIndex = 0;
+        }
+
+        private void SelectDefaultUnitFromJob(ODBppExtractor.JobReport report)
+        {
+            if (report?.Steps == null || report.Steps.Count == 0)
+            {
+                return;
+            }
+
+            var step = report.Steps.FirstOrDefault();
+            var layer = step?.Layers?.FirstOrDefault();
+            var unit = layer?.Components?.Unit ?? step?.Unit;
+            _suspendSelection = true;
+            SetUnitSelection(unit);
+            _suspendSelection = false;
+        }
+
         private IReadOnlyList<ODBppExtractor.ComponentPlacementInfo> GetCurrentPlacementData()
         {
             if (_currentJobReport == null)
@@ -613,7 +689,8 @@ namespace ODB___Extractor
             return ODBppExtractor.GetComponentPlacements(
                 _currentJobReport,
                 topLeft: origin == ODBppExtractor.CoordinateOrigin.TopLeft,
-                flipOptions: flipOptions);
+                flipOptions: flipOptions,
+                targetUnit: GetTargetUnit());
         }
 
         private ODBppExtractor.ComponentPlacementFlipOptions BuildComponentPlacementFlipOptions()
@@ -654,6 +731,16 @@ namespace ODB___Extractor
         }
 
         private void cbo_Origin_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_suspendSelection)
+            {
+                return;
+            }
+
+            HandleLayerSelectionChange();
+        }
+
+        private void cbo_Unit_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (_suspendSelection)
             {
@@ -712,6 +799,7 @@ namespace ODB___Extractor
             Localizer.Apply(this);
             UpdateGridHeaders();
             UpdateOriginCombo();
+            UpdateUnitCombo();
             if (_currentJobReport == null)
             {
                 lbl_Status.Text = DefaultStatusText;
@@ -808,7 +896,7 @@ namespace ODB___Extractor
                 layerFilter = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { selectedLayer.Name };
             }
 
-            return GenerateViewerXml(_currentJobReport, origin, layerFilter, flipOptions);
+            return GenerateViewerXml(_currentJobReport, origin, layerFilter, flipOptions, GetTargetUnit());
         }
 
         private void RefreshViewer(bool autoFit)
@@ -857,12 +945,14 @@ namespace ODB___Extractor
             ODBppExtractor.JobReport report,
             ODBppExtractor.CoordinateOrigin origin,
             HashSet<string> layerFilter,
-            ODBppExtractor.ComponentPlacementFlipOptions flipOptions)
+            ODBppExtractor.ComponentPlacementFlipOptions flipOptions,
+            string targetUnit)
         {
             var placements = ODBppExtractor.GetComponentPlacements(
                 report,
                 topLeft: origin == ODBppExtractor.CoordinateOrigin.TopLeft,
-                flipOptions: flipOptions);
+                flipOptions: flipOptions,
+                targetUnit: targetUnit);
 
             // Group by step and layer
             var stepGroups = placements
@@ -906,18 +996,25 @@ namespace ODB___Extractor
 
                     var layerElement = new XElement("layer",
                         new XAttribute("name", layerName),
-                        new XAttribute("unit", layerReport.Components?.Unit ?? stepReport.Unit ?? "MM"),
+                        new XAttribute("unit", targetUnit ?? layerReport.Components?.Unit ?? stepReport.Unit ?? "MM"),
                         componentElements);
 
                     layerElements.Add(layerElement);
                 }
 
+                var stepUnit = stepReport.Unit ?? "MM";
                 var width = stepReport.ProfileBoundingBox?.MaxX - stepReport.ProfileBoundingBox?.MinX ?? 0;
                 var length = stepReport.ProfileBoundingBox?.MaxY - stepReport.ProfileBoundingBox?.MinY ?? 0;
+                if (!string.IsNullOrWhiteSpace(targetUnit))
+                {
+                    width = ODBppExtractor.ConvertUnitValue(width, stepUnit, targetUnit);
+                    length = ODBppExtractor.ConvertUnitValue(length, stepUnit, targetUnit);
+                    stepUnit = targetUnit;
+                }
 
                 var stepElement = new XElement("step",
                     new XAttribute("name", stepName),
-                    new XAttribute("unit", stepReport.Unit ?? "MM"),
+                    new XAttribute("unit", stepUnit),
                     new XAttribute("width", FormatDimension(width)),
                     new XAttribute("length", FormatDimension(length)),
                     layerElements);
@@ -943,6 +1040,58 @@ namespace ODB___Extractor
                 doc.Save(stringWriter);
                 return stringWriter.ToString();
             }
+        }
+
+        private string GetTargetUnit()
+        {
+            var selectedUnit = GetSelectedUnit();
+            return NormalizeUnit(selectedUnit);
+        }
+
+        private static string NormalizeUnit(string unit)
+        {
+            if (string.IsNullOrWhiteSpace(unit))
+            {
+                return null;
+            }
+
+            var normalized = unit.Trim().ToUpperInvariant();
+            switch (normalized)
+            {
+                case "IN":
+                case "INCH":
+                    return "INCH";
+                case "MM":
+                case "MILLIMETER":
+                case "MILLIMETERS":
+                    return "MM";
+                default:
+                    return normalized;
+            }
+        }
+
+        private string GetSelectedUnit()
+        {
+            return cbo_Unit.SelectedItem is UnitChoice choice ? choice.Unit : null;
+        }
+
+        private string GetSelectedUnitDisplay()
+        {
+            return cbo_Unit.SelectedItem is UnitChoice choice ? choice.Display : null;
+        }
+
+        private sealed class UnitChoice
+        {
+            public UnitChoice(string unit, string display)
+            {
+                Unit = unit;
+                Display = display;
+            }
+
+            public string Unit { get; }
+            public string Display { get; }
+
+            public override string ToString() => Display ?? base.ToString();
         }
     }
 }

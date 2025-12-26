@@ -55,6 +55,8 @@ namespace ODB___Extractor
             this.lbl_Status = new SRMControl.SRMLabel();
             this.btn_ExportLayer = new SRMControl.SRMButton();
             this.btn_ExportAllLayer = new SRMControl.SRMButton();
+            this.lbl_Unit = new SRMControl.SRMLabel();
+            this.cbo_Unit = new SRMControl.SRMComboBox();
             this.gb_ImportODBpp.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_Data)).BeginInit();
             this.gb_Data.SuspendLayout();
@@ -184,6 +186,9 @@ namespace ODB___Extractor
             // gb_Data
             // 
             this.gb_Data.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(150)))), ((int)(((byte)(185)))));
+            this.gb_Data.Controls.Add(this.btn_PreviewData);
+            this.gb_Data.Controls.Add(this.lbl_Unit);
+            this.gb_Data.Controls.Add(this.cbo_Unit);
             this.gb_Data.Controls.Add(this.chk_FlipYAxis);
             this.gb_Data.Controls.Add(this.chk_FlipXAxis);
             this.gb_Data.Controls.Add(this.cbo_Origin);
@@ -255,7 +260,6 @@ namespace ODB___Extractor
             // gb_Export
             // 
             this.gb_Export.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(150)))), ((int)(((byte)(185)))));
-            this.gb_Export.Controls.Add(this.btn_PreviewData);
             this.gb_Export.Controls.Add(this.lbl_Status);
             this.gb_Export.Controls.Add(this.btn_ExportLayer);
             this.gb_Export.Controls.Add(this.btn_ExportAllLayer);
@@ -282,6 +286,22 @@ namespace ODB___Extractor
             this.btn_ExportAllLayer.Name = "btn_ExportAllLayer";
             this.btn_ExportAllLayer.UseVisualStyleBackColor = true;
             this.btn_ExportAllLayer.Click += new System.EventHandler(this.btn_ExportAllLayer_Click);
+            // 
+            // lbl_Unit
+            // 
+            resources.ApplyResources(this.lbl_Unit, "lbl_Unit");
+            this.lbl_Unit.Name = "lbl_Unit";
+            this.lbl_Unit.TextShadowColor = System.Drawing.Color.Gray;
+            // 
+            // cbo_Unit
+            // 
+            this.cbo_Unit.BackColor = System.Drawing.Color.White;
+            this.cbo_Unit.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbo_Unit.FocusBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.cbo_Unit.FormattingEnabled = true;
+            resources.ApplyResources(this.cbo_Unit, "cbo_Unit");
+            this.cbo_Unit.Name = "cbo_Unit";
+            this.cbo_Unit.NormalBackColor = System.Drawing.Color.White;
             // 
             // ExtractorForm
             // 
@@ -330,5 +350,7 @@ namespace ODB___Extractor
         private SRMControl.SRMCheckBox chk_FlipXAxis;
         private SRMControl.SRMCheckBox chk_FlipYAxis;
         private SRMControl.SRMButton btn_PreviewData;
+        private SRMControl.SRMLabel lbl_Unit;
+        private SRMControl.SRMComboBox cbo_Unit;
     }
 }

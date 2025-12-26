@@ -261,6 +261,9 @@
   <data name="lbl_Step.Text" xml:space="preserve">
     <value>Step:</value>
   </data>
+  <data name="lbl_Step.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleRight</value>
+  </data>
   <data name="&gt;&gt;lbl_Step.Name" xml:space="preserve">
     <value>lbl_Step</value>
   </data>
@@ -271,13 +274,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Step.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>10</value>
   </data>
   <data name="lbl_Layer.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="lbl_Layer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>226, 32</value>
+    <value>267, 32</value>
   </data>
   <data name="lbl_Layer.Size" type="System.Drawing.Size, System.Drawing">
     <value>48, 17</value>
@@ -287,6 +290,9 @@
   </data>
   <data name="lbl_Layer.Text" xml:space="preserve">
     <value>Layer:</value>
+  </data>
+  <data name="lbl_Layer.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleRight</value>
   </data>
   <data name="&gt;&gt;lbl_Layer.Name" xml:space="preserve">
     <value>lbl_Layer</value>
@@ -298,13 +304,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Layer.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>12</value>
   </data>
   <data name="cbo_Step.Location" type="System.Drawing.Point, System.Drawing">
     <value>63, 29</value>
   </data>
   <data name="cbo_Step.Size" type="System.Drawing.Size, System.Drawing">
-    <value>130, 23</value>
+    <value>170, 23</value>
   </data>
   <data name="cbo_Step.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -319,13 +325,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;cbo_Step.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>13</value>
   </data>
   <data name="cbo_Layer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>280, 29</value>
+    <value>321, 29</value>
   </data>
   <data name="cbo_Layer.Size" type="System.Drawing.Size, System.Drawing">
-    <value>140, 23</value>
+    <value>170, 23</value>
   </data>
   <data name="cbo_Layer.TabIndex" type="System.Int32, mscorlib">
     <value>9</value>
@@ -340,16 +346,16 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;cbo_Layer.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>11</value>
   </data>
   <data name="dgv_Data.Location" type="System.Drawing.Point, System.Drawing">
-    <value>19, 69</value>
+    <value>19, 104</value>
   </data>
   <data name="dgv_Data.RowHeadersWidth" type="System.Int32, mscorlib">
     <value>51</value>
   </data>
   <data name="dgv_Data.Size" type="System.Drawing.Size, System.Drawing">
-    <value>723, 273</value>
+    <value>723, 270</value>
   </data>
   <data name="dgv_Data.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
@@ -364,13 +370,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;dgv_Data.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>9</value>
   </data>
   <data name="lbl_Statistic.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="lbl_Statistic.Location" type="System.Drawing.Point, System.Drawing">
-    <value>16, 349</value>
+    <value>16, 377</value>
   </data>
   <data name="lbl_Statistic.Size" type="System.Drawing.Size, System.Drawing">
     <value>57, 17</value>
@@ -391,13 +397,91 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Statistic.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>8</value>
+  </data>
+  <data name="btn_PreviewData.Location" type="System.Drawing.Point, System.Drawing">
+    <value>642, 63</value>
+  </data>
+  <data name="btn_PreviewData.Size" type="System.Drawing.Size, System.Drawing">
+    <value>100, 28</value>
+  </data>
+  <data name="btn_PreviewData.TabIndex" type="System.Int32, mscorlib">
+    <value>16</value>
+  </data>
+  <data name="btn_PreviewData.Text" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="&gt;&gt;btn_PreviewData.Name" xml:space="preserve">
+    <value>btn_PreviewData</value>
+  </data>
+  <data name="&gt;&gt;btn_PreviewData.Type" xml:space="preserve">
+    <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;btn_PreviewData.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;btn_PreviewData.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbl_Unit.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbl_Unit.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lbl_Unit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>16, 69</value>
+  </data>
+  <data name="lbl_Unit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>37, 17</value>
+  </data>
+  <data name="lbl_Unit.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
+  </data>
+  <data name="lbl_Unit.Text" xml:space="preserve">
+    <value>Unit:</value>
+  </data>
+  <data name="lbl_Unit.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleRight</value>
+  </data>
+  <data name="&gt;&gt;lbl_Unit.Name" xml:space="preserve">
+    <value>lbl_Unit</value>
+  </data>
+  <data name="&gt;&gt;lbl_Unit.Type" xml:space="preserve">
+    <value>SRMControl.SRMLabel, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;lbl_Unit.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;lbl_Unit.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="cbo_Unit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>63, 66</value>
+  </data>
+  <data name="cbo_Unit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>170, 23</value>
+  </data>
+  <data name="cbo_Unit.TabIndex" type="System.Int32, mscorlib">
+    <value>16</value>
+  </data>
+  <data name="&gt;&gt;cbo_Unit.Name" xml:space="preserve">
+    <value>cbo_Unit</value>
+  </data>
+  <data name="&gt;&gt;cbo_Unit.Type" xml:space="preserve">
+    <value>SRMControl.SRMComboBox, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;cbo_Unit.Parent" xml:space="preserve">
+    <value>gb_Data</value>
+  </data>
+  <data name="&gt;&gt;cbo_Unit.ZOrder" xml:space="preserve">
+    <value>2</value>
   </data>
   <data name="chk_FlipYAxis.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="chk_FlipYAxis.Location" type="System.Drawing.Point, System.Drawing">
-    <value>618, 345</value>
+    <value>512, 65</value>
   </data>
   <data name="chk_FlipYAxis.Size" type="System.Drawing.Size, System.Drawing">
     <value>124, 24</value>
@@ -418,13 +502,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;chk_FlipYAxis.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>3</value>
   </data>
   <data name="chk_FlipXAxis.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="chk_FlipXAxis.Location" type="System.Drawing.Point, System.Drawing">
-    <value>488, 345</value>
+    <value>512, 28</value>
   </data>
   <data name="chk_FlipXAxis.Size" type="System.Drawing.Size, System.Drawing">
     <value>124, 24</value>
@@ -445,13 +529,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;chk_FlipXAxis.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>4</value>
   </data>
   <data name="cbo_Origin.Location" type="System.Drawing.Point, System.Drawing">
-    <value>506, 29</value>
+    <value>321, 66</value>
   </data>
   <data name="cbo_Origin.Size" type="System.Drawing.Size, System.Drawing">
-    <value>130, 23</value>
+    <value>170, 23</value>
   </data>
   <data name="cbo_Origin.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
@@ -466,7 +550,7 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;cbo_Origin.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>5</value>
   </data>
   <data name="lbl_Origin.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -475,7 +559,7 @@
     <value>NoControl</value>
   </data>
   <data name="lbl_Origin.Location" type="System.Drawing.Point, System.Drawing">
-    <value>452, 32</value>
+    <value>267, 69</value>
   </data>
   <data name="lbl_Origin.Size" type="System.Drawing.Size, System.Drawing">
     <value>50, 17</value>
@@ -485,6 +569,9 @@
   </data>
   <data name="lbl_Origin.Text" xml:space="preserve">
     <value>Origin:</value>
+  </data>
+  <data name="lbl_Origin.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleRight</value>
   </data>
   <data name="&gt;&gt;lbl_Origin.Name" xml:space="preserve">
     <value>lbl_Origin</value>
@@ -496,16 +583,16 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;lbl_Origin.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>6</value>
   </data>
   <data name="btn_RefreshData.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="btn_RefreshData.Location" type="System.Drawing.Point, System.Drawing">
-    <value>662, 21</value>
+    <value>642, 26</value>
   </data>
   <data name="btn_RefreshData.Size" type="System.Drawing.Size, System.Drawing">
-    <value>80, 38</value>
+    <value>100, 28</value>
   </data>
   <data name="btn_RefreshData.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -523,13 +610,13 @@
     <value>gb_Data</value>
   </data>
   <data name="&gt;&gt;btn_RefreshData.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>7</value>
   </data>
   <data name="gb_Data.Location" type="System.Drawing.Point, System.Drawing">
     <value>11, 88</value>
   </data>
   <data name="gb_Data.Size" type="System.Drawing.Size, System.Drawing">
-    <value>760, 377</value>
+    <value>760, 407</value>
   </data>
   <data name="gb_Data.TabIndex" type="System.Int32, mscorlib">
     <value>12</value>
@@ -549,35 +636,11 @@
   <data name="&gt;&gt;gb_Data.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="btn_PreviewData.Location" type="System.Drawing.Point, System.Drawing">
-    <value>357, 21</value>
-  </data>
-  <data name="btn_PreviewData.Size" type="System.Drawing.Size, System.Drawing">
-    <value>83, 38</value>
-  </data>
-  <data name="btn_PreviewData.TabIndex" type="System.Int32, mscorlib">
-    <value>16</value>
-  </data>
-  <data name="btn_PreviewData.Text" xml:space="preserve">
-    <value>Preview</value>
-  </data>
-  <data name="&gt;&gt;btn_PreviewData.Name" xml:space="preserve">
-    <value>btn_PreviewData</value>
-  </data>
-  <data name="&gt;&gt;btn_PreviewData.Type" xml:space="preserve">
-    <value>SRMControl.SRMButton, SRMControl, Version=6.1.0.1, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;btn_PreviewData.Parent" xml:space="preserve">
-    <value>gb_Export</value>
-  </data>
-  <data name="&gt;&gt;btn_PreviewData.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
   <data name="lbl_Status.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="lbl_Status.Location" type="System.Drawing.Point, System.Drawing">
-    <value>15, 32</value>
+    <value>16, 32</value>
   </data>
   <data name="lbl_Status.Size" type="System.Drawing.Size, System.Drawing">
     <value>48, 17</value>
@@ -598,7 +661,7 @@
     <value>gb_Export</value>
   </data>
   <data name="&gt;&gt;lbl_Status.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>0</value>
   </data>
   <data name="btn_ExportLayer.Location" type="System.Drawing.Point, System.Drawing">
     <value>446, 21</value>
@@ -622,7 +685,7 @@
     <value>gb_Export</value>
   </data>
   <data name="&gt;&gt;btn_ExportLayer.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>1</value>
   </data>
   <data name="btn_ExportAllLayer.Location" type="System.Drawing.Point, System.Drawing">
     <value>612, 21</value>
@@ -646,10 +709,10 @@
     <value>gb_Export</value>
   </data>
   <data name="&gt;&gt;btn_ExportAllLayer.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>2</value>
   </data>
   <data name="gb_Export.Location" type="System.Drawing.Point, System.Drawing">
-    <value>11, 471</value>
+    <value>11, 501</value>
   </data>
   <data name="gb_Export.Size" type="System.Drawing.Size, System.Drawing">
     <value>760, 70</value>
@@ -688,7 +751,7 @@
     <value>True</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>782, 553</value>
+    <value>782, 583</value>
   </data>
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
     <value>CenterScreen</value>
