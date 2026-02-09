@@ -206,7 +206,9 @@ namespace ODB___Extractor
                 return;
 
             var filter = (txt_Search.Text ?? string.Empty).Trim().ToLowerInvariant();
-            var filtered = layer.Components.Where(c => c.Name.ToLower().Contains(filter)).ToList();
+            var filtered = layer.Components.Where(c =>
+                c.Name.ToLower().Contains(filter) ||
+                c.PackageName.ToLower().Contains(filter)).ToList();
 
             foreach (var comp in filtered)
             {
