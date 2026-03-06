@@ -364,3 +364,9 @@ FodyWeavers.xsd
 
 # Test Data
 test-data/
+
+# Docs Images
+docs/images/
+
+# Compiled PDF files
+*.pdf
